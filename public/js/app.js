@@ -2016,30 +2016,33 @@ __webpack_require__.r(__webpack_exports__);
       return fetch('/');
     },
     sendMessage: function sendMessage() {
+      var _this = this;
+
       event.preventDefault();
-      console.log(123);
-      this.threadsData = axios.post('chat/send_message_to_thread/', {
+      axios.post('chat/send_message_to_thread/', {
         'body': new FormData(event.target).get('body'),
         'thread_id': new FormData(event.target).get('threadId')
+      }).then(function (response) {
+        _this.threadMessages = response.data;
       });
     },
     addThread: function addThread(event) {
-      var _this = this;
+      var _this2 = this;
 
       event.preventDefault();
       axios.post('chat/create_thread/', {
         'name': new FormData(event.target).get('name')
       }).then(function (response) {
-        _this.threadsData = response;
+        _this2.threadsData = response.data;
       });
     },
     openThread: function openThread(event) {
-      var _this2 = this;
+      var _this3 = this;
 
       axios.get('chat/get_thread?thread_id=' + event.target.dataset.id).then(function (response) {
         console.log(response.data);
-        _this2.threadMessages = response;
-        _this2.currentThread = event.target.dataset.id;
+        _this3.threadMessages = response.data;
+        _this3.currentThread = event.target.dataset.id;
       });
     }
   }
@@ -2590,7 +2593,7 @@ var render = function() {
       { staticStyle: { width: "70%" } },
       _vm._l(_vm.threadMessages, function(threadMessage) {
         return _c("li", [
-          _vm._v("\n      " + _vm._s(_vm.message.body) + "\n    ")
+          _vm._v("\n      " + _vm._s(threadMessage.body) + "\n    ")
         ])
       }),
       0

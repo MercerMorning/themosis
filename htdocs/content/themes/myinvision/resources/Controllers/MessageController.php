@@ -14,23 +14,22 @@ class MessageController extends Controller
     public function send(Request $request)
     {
         $validator = Validator::make($request->all(), [
+            'thread_id' => 'required|exists:threads,id',
             'body' => 'required|string',
         ]);
 
         if ($validator->fails()) {
+            return $validator->errors();
             return response(400);
         }
 
-        $thread = ThreadMessage::create(['body' => $request->get('body')]);
+        $message = ThreadMessage::create([
+            'user_id' => wp_get_current_user()->ID,
+            'thread_id' => $request->get('thread_id'),
+            'body' => $request->get('body')]);
 
-
-        $userThreads = User::find(wp_get_current_user()->ID)->threads();
-
-        $isSuccess = ThreadParticipant::create(['thread_id' => $thread->id,
-            'user_id' => wp_get_current_user()->ID
-        ]);
-        if ($isSuccess) {
-            return response($userThreads);
+        if ($message) {
+            return Thread::find($request->get('thread_id'))->messages();
         }
         return response(400);
     }

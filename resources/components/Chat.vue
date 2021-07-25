@@ -24,7 +24,7 @@
     </div>
     <ul style="width: 70%">
       <li v-for="threadMessage in threadMessages">
-        {{ message.body }}
+        {{ threadMessage.body }}
       </li>
     </ul>
     <form action="" v-on:submit.prevent="sendMessage">
@@ -62,10 +62,11 @@ export default {
     },
     sendMessage: function () {
       event.preventDefault();
-      console.log(123);
-      this.threadsData = axios.post('chat/send_message_to_thread/',  {
+      axios.post('chat/send_message_to_thread/',  {
         'body' : new FormData(event.target).get('body'),
         'thread_id' : new FormData(event.target).get('threadId')
+      }).then(response => {
+        this.threadMessages = response.data
       })
     },
     addThread: function (event) {
@@ -73,13 +74,13 @@ export default {
       axios.post('chat/create_thread/',  {
         'name' : new FormData(event.target).get('name')
       }).then( response => {
-        this.threadsData = response
+        this.threadsData = response.data
       })
     },
     openThread: function (event) {
       axios.get('chat/get_thread?thread_id=' +  event.target.dataset.id).then( response => {
         console.log(response.data)
-        this.threadMessages = response
+        this.threadMessages = response.data
         this.currentThread = event.target.dataset.id;
       })
     }
