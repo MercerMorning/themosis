@@ -40,7 +40,7 @@ class ThreadController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response('','404');
+            return response(400);
         }
 
         return ThreadParticipant::create(['thread_id' => $request->get('thread_id'),
@@ -48,8 +48,21 @@ class ThreadController extends Controller
         ]);
     }
 
-    public function getAll()
+    public function getThreadMessages(Request $request)
     {
+//        return $request->all();
+        $validator = Validator::make($request->all(), [
+            'thread_id' => 'required|exists:threads,id',
+        ]);
 
+        if ($validator->fails()) {
+            return response(400);
+        }
+
+        $threadMessages = Thread::find($request->get('thread_id'))->messages();
+        if ($threadMessages) {
+            return response(Thread::find($request->get('thread_id'))->messages());
+        }
+         return response(400);
     }
 }

@@ -8,24 +8,30 @@
 
     <div style="width: 50%">
         <ul>
-          <li v-for="thread in JSON.parse(threads)">
-            <button data-threadid={{ thread.id }} v-on:click="">{{ thread.subject }}</button>
+          <li v-for="thread in JSON.parse(threadsData)">
+            <button v-bind:data-id="thread.id" v-on:click="openThread">{{ thread.subject }}</button>
           </li>
         </ul>
     </div>
+
     <div style="width: 50%; float: right">
+      <div v-if="threadMessages">
+
+      </div>
+      <div v-else>
         Здесь пока пусто
+      </div>
     </div>
     <ul style="width: 70%">
-      <li v-for="message in messages">
-        {{ message }}
+      <li v-for="threadMessage in threadMessages">
+        {{ message.body }}
       </li>
     </ul>
-<!--    <form action="" v-on:submit.prevent="sendMeоssage">-->
-<!--      <input type="hidden" name="__nonce" value="<?php echo wp_create_nonce('message') ;?> ">-->
-<!--      <input type="text" id="message-input">-->
-<!--      <input type="submit">-->
-<!--    </form>-->
+    <form action="" v-on:submit.prevent="sendMessage">
+      <input type="hidden" name="threadId" v-bind:value="currentThread">
+      <input type="text" name="body" id="message-input">
+      <input type="submit">
+    </form>
   </div>
 </template>
 
@@ -43,8 +49,10 @@ export default {
   data: function () {
     {
       return {
-        messages: ['hi!', 'df'],
+        threadsData: this.threads,
         threadBody: null,
+        currentThread: null,
+        threadMessages: null,
       }
     }
   },
@@ -54,22 +62,26 @@ export default {
     },
     sendMessage: function () {
       event.preventDefault();
-      console.log(1);
-      // // `this` внутри методов указывает на экземпляр Vue
-      // alert('Привет, ' + this.name + '!')
-      // // `event` — нативное событие DOM
-      // if (event) {
-      //     alert(event.target.tagName)
-      // }
+      console.log(123);
+      this.threadsData = axios.post('chat/send_message_to_thread/',  {
+        'body' : new FormData(event.target).get('body'),
+        'thread_id' : new FormData(event.target).get('threadId')
+      })
     },
     addThread: function (event) {
       event.preventDefault();
-      this.threads = axios.post('chat/create_thread/',  {
+      axios.post('chat/create_thread/',  {
         'name' : new FormData(event.target).get('name')
+      }).then( response => {
+        this.threadsData = response
       })
     },
     openThread: function (event) {
-      console.log(123);
+      axios.get('chat/get_thread?thread_id=' +  event.target.dataset.id).then( response => {
+        console.log(response.data)
+        this.threadMessages = response
+        this.currentThread = event.target.dataset.id;
+      })
     }
   }
 }

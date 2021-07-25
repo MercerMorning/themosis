@@ -1987,6 +1987,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   mounted: function mounted() {
     // console.log(this.token)
@@ -1998,8 +2004,10 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     {
       return {
-        messages: ['hi!', 'df'],
-        threadBody: null
+        threadsData: this.threads,
+        threadBody: null,
+        currentThread: null,
+        threadMessages: null
       };
     }
   },
@@ -2009,21 +2017,30 @@ __webpack_require__.r(__webpack_exports__);
     },
     sendMessage: function sendMessage() {
       event.preventDefault();
-      console.log(1); // // `this` внутри методов указывает на экземпляр Vue
-      // alert('Привет, ' + this.name + '!')
-      // // `event` — нативное событие DOM
-      // if (event) {
-      //     alert(event.target.tagName)
-      // }
+      console.log(123);
+      this.threadsData = axios.post('chat/send_message_to_thread/', {
+        'body': new FormData(event.target).get('body'),
+        'thread_id': new FormData(event.target).get('threadId')
+      });
     },
     addThread: function addThread(event) {
+      var _this = this;
+
       event.preventDefault();
-      this.threads = axios.post('chat/create_thread/', {
+      axios.post('chat/create_thread/', {
         'name': new FormData(event.target).get('name')
+      }).then(function (response) {
+        _this.threadsData = response;
       });
     },
     openThread: function openThread(event) {
-      console.log(123);
+      var _this2 = this;
+
+      axios.get('chat/get_thread?thread_id=' + event.target.dataset.id).then(function (response) {
+        console.log(response.data);
+        _this2.threadMessages = response;
+        _this2.currentThread = event.target.dataset.id;
+      });
     }
   }
 });
@@ -2546,13 +2563,13 @@ var render = function() {
     _c("div", { staticStyle: { width: "50%" } }, [
       _c(
         "ul",
-        _vm._l(JSON.parse(_vm.threads), function(thread) {
+        _vm._l(JSON.parse(_vm.threadsData), function(thread) {
           return _c("li", [
             _c(
               "button",
               {
-                attrs: { "data-threadid": "{{", "thread.id": "", "}}": "" },
-                on: { click: function($event) {} }
+                attrs: { "data-id": thread.id },
+                on: { click: _vm.openThread }
               },
               [_vm._v(_vm._s(thread.subject))]
             )
@@ -2563,16 +2580,45 @@ var render = function() {
     ]),
     _vm._v(" "),
     _c("div", { staticStyle: { width: "50%", float: "right" } }, [
-      _vm._v("\n        Здесь пока пусто\n    ")
+      _vm.threadMessages
+        ? _c("div")
+        : _c("div", [_vm._v("\n      Здесь пока пусто\n    ")])
     ]),
     _vm._v(" "),
     _c(
       "ul",
       { staticStyle: { width: "70%" } },
-      _vm._l(_vm.messages, function(message) {
-        return _c("li", [_vm._v("\n        " + _vm._s(message) + "\n      ")])
+      _vm._l(_vm.threadMessages, function(threadMessage) {
+        return _c("li", [
+          _vm._v("\n      " + _vm._s(_vm.message.body) + "\n    ")
+        ])
       }),
       0
+    ),
+    _vm._v(" "),
+    _c(
+      "form",
+      {
+        attrs: { action: "" },
+        on: {
+          submit: function($event) {
+            $event.preventDefault()
+            return _vm.sendMessage.apply(null, arguments)
+          }
+        }
+      },
+      [
+        _c("input", {
+          attrs: { type: "hidden", name: "threadId" },
+          domProps: { value: _vm.currentThread }
+        }),
+        _vm._v(" "),
+        _c("input", {
+          attrs: { type: "text", name: "body", id: "message-input" }
+        }),
+        _vm._v(" "),
+        _c("input", { attrs: { type: "submit" } })
+      ]
     )
   ])
 }
