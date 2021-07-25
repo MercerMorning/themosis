@@ -9,16 +9,8 @@ class ChatController extends Controller
 {
     public function index()
     {
-        $threads = \Theme\Models\Thread::all();
+        $threads = User::find(wp_get_current_user()->ID)->threads();
         $users = \Theme\Models\User::all();
-
-//        $threadParticipants = ThreadParticipant::all('user_id', 'thread_id');
-//        $threadParticipants = $threadParticipants
-//            ->groupBy('thread_id')
-//            ->map(function ($item) {
-//                return $item->pluck('user_id');
-//            })
-//            ->toArray();
 
         return view('front.chat', [
             'threads' => $threads,
