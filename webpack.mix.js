@@ -11,8 +11,9 @@ let mix = require('laravel-mix');
  |
  */
 
-mix.js('resources/js/app.js', 'htdocs/dist/')
-    .sass('resources/sass/app.scss', 'htdocs/dist/');
+mix.js('resources/js/app.js', 'htdocs/content/themes/myinvision/assets/js/app.js')
+    .vue('resources/js/app.js', 'public/js')
+    // .sass('resources/sass/app.scss', 'htdocs/dist/');
 
 // Full API
 // mix.js(src, output);

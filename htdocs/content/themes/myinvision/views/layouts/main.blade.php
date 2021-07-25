@@ -7,8 +7,7 @@
     @head
 </head>
 <body @php(body_class())>
-Hello, world
-
+@yield('main_content')
 @footer
 
 </body>

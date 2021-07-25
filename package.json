@@ -20,7 +20,10 @@
   "homepage": "https://github.com/themosis/themosis#readme",
   "devDependencies": {
     "cross-env": "^5.2.0",
-    "laravel-mix": "^4.0.15"
+    "laravel-mix": "^4.1.4",
+    "resolve-url-loader": "^3.1.0",
+    "sass": "^1.36.0",
+    "sass-loader": "^7.3.1"
   },
   "dependencies": {
     "axios": "^0.21.1",

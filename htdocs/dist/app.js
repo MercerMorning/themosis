@@ -12864,7 +12864,7 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_Chat_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../components/Chat.vue */ "./resources/components/Chat.vue");
-window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
+window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js")["default"];
 
 Vue.component('chat-component', _components_Chat_vue__WEBPACK_IMPORTED_MODULE_0__["default"]);
 var app = new Vue({
