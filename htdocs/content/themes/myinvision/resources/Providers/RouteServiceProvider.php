@@ -29,8 +29,11 @@ class RouteServiceProvider extends ServiceProvider
             '\/'
         );
 
-        Route::middleware('web')
-            ->namespace($this->namespace)
+        Route::namespace($this->namespace)
             ->group(themes_path($themeName.'/routes.php'));
+
+//        Route::middleware('web')
+//            ->namespace($this->namespace)
+//            ->group(themes_path($themeName.'/routes.php'));
     }
 }
