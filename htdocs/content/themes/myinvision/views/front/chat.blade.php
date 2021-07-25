@@ -1,15 +1,13 @@
 @extends('layouts.main')
 @section('main_content')
-    <div>
         <div id="app">
-            <div>
-                @foreach($users as $user)
-                    <form method="post" id="add-thread-form" action="{{ route('send_message_to_user') }}">
-                        <input type="hidden" name="user_id" value="{{ $user->ID }}">
-                        <input name="body" type="text">
-                        <input type="submit">
-                    </form>
-                @endforeach
+{{--                @foreach($users as $user)--}}
+{{--                    <form method="post" id="add-thread-form" action="{{ route('send_message_to_user') }}">--}}
+{{--                        <input type="hidden" name="user_id" value="{{ $user->ID }}">--}}
+{{--                        <input name="body" type="text">--}}
+{{--                        <input type="submit">--}}
+{{--                    </form>--}}
+{{--                @endforeach--}}
 {{--                @foreach($threads as $thread)--}}
 {{--                <form method="post" id="add-thread-form" action="{{ route('invite_participant') }}">--}}
 {{--                    <input type="hidden" name="thread_id" value="{{ $thread->id }}">--}}
@@ -31,6 +29,5 @@
                 >
                 </chat-component>
             </div>
-        </div>
     </div>
 @endsection

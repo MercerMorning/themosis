@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html {!! get_language_attributes() !!}>
 <head>
     <meta charset="{{ get_bloginfo('charset') }}">
@@ -9,6 +9,5 @@
 <body @php(body_class())>
 @yield('main_content')
 @footer
-
 </body>
 </html>

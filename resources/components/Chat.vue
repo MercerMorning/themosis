@@ -1,6 +1,6 @@
 <template>
   <div class="chat-container">
-    <form method="post" id="add-thread-form" action="chat/create_thread">
+    <form v-on:submit.prevent="addThread" method="post" id="add-thread-form" action="chat/create_thread">
       <input type="hidden" name="_token" v-bind:value="token">
       <input type="text" name="name" id="add-thread-text" required>
       <input type="submit">
@@ -52,4 +52,6 @@ export default {
     }
   }
 }
+
+
 </script>

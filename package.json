@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
-    "vue": "^2.6.14",
+    "vue": "^2.5.17",
     "vue-template-compiler": "^2.6.14"
   }
 }

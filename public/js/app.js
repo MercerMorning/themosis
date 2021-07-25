@@ -641,6 +641,12 @@ var render = function() {
           method: "post",
           id: "add-thread-form",
           action: "chat/create_thread"
+        },
+        on: {
+          submit: function($event) {
+            $event.preventDefault()
+            return _vm.addThread.apply(null, arguments)
+          }
         }
       },
       [
