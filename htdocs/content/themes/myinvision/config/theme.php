@@ -30,6 +30,10 @@ return [
         Theme\Providers\RouteServiceProvider::class
     ],
 
+    'Theme\\Controllers\\' => 'resources.controllers',
+    'Theme\\Models\\' => 'resources.models',
+    'Theme\\Providers\\' => 'resources.providers',
+
     /*
     |--------------------------------------------------------------------------
     | Theme views directories path.

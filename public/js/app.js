@@ -102,14 +102,49 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   mounted: function mounted() {
-    console.log('Component mounted.');
+    // console.log(this.token)
+    console.log("Hello Vue!");
   },
-  methods: {// setlocale(e) {
-    //   // console.log($(e.target).attr('lang'))
-    //   axios.get('/set/' + $(e.target).attr('lang')).then((response) => console.log(response));
-    // }
+  props: {
+    token: String
+  },
+  data: function data() {
+    {
+      return {
+        messages: ['hi!', 'df']
+      };
+    }
+  },
+  methods: {
+    sendMessage: function sendMessage() {
+      event.preventDefault();
+      console.log(1); // // `this` внутри методов указывает на экземпляр Vue
+      // alert('Привет, ' + this.name + '!')
+      // // `event` — нативное событие DOM
+      // if (event) {
+      //     alert(event.target.tagName)
+      // }
+    },
+    addThread: function addThread(event) {
+      event.preventDefault();
+    }
   }
 });
 
@@ -598,7 +633,43 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", [_vm._v("\n  123\n")])
+  return _c("div", { staticClass: "chat-container" }, [
+    _c(
+      "form",
+      {
+        attrs: {
+          method: "post",
+          id: "add-thread-form",
+          action: "chat/create_thread"
+        }
+      },
+      [
+        _c("input", {
+          attrs: { type: "hidden", name: "_token" },
+          domProps: { value: _vm.token }
+        }),
+        _vm._v(" "),
+        _c("input", {
+          attrs: {
+            type: "text",
+            name: "name",
+            id: "add-thread-text",
+            required: ""
+          }
+        }),
+        _vm._v(" "),
+        _c("input", { attrs: { type: "submit" } })
+      ]
+    ),
+    _vm._v(" "),
+    _c(
+      "ul",
+      _vm._l(_vm.messages, function(message) {
+        return _c("li", [_vm._v("\n        " + _vm._s(message) + "\n      ")])
+      }),
+      0
+    )
+  ])
 }
 var staticRenderFns = []
 render._withStripped = true
