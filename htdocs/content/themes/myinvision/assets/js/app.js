@@ -1993,18 +1993,27 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   mounted: function mounted() {
     // console.log(this.token)
     console.log("Hello Vue!"); // console.log(this.threads());
   },
   props: {
-    threads: String
+    threads: String,
+    users: String
   },
   data: function data() {
     {
       return {
-        threadsData: this.threads,
+        threadsData: JSON.parse(this.threads),
+        usersData: JSON.parse(this.users),
         threadBody: null,
         currentThread: null,
         threadMessages: null
@@ -2566,7 +2575,17 @@ var render = function() {
     _c("div", { staticStyle: { width: "50%" } }, [
       _c(
         "ul",
-        _vm._l(JSON.parse(_vm.threadsData), function(thread) {
+        _vm._l(_vm.usersData, function(user) {
+          return _c("li", [_c("button", [_vm._v(_vm._s(user.user_login))])])
+        }),
+        0
+      )
+    ]),
+    _vm._v(" "),
+    _c("div", { staticStyle: { width: "50%" } }, [
+      _c(
+        "ul",
+        _vm._l(_vm.threadsData, function(thread) {
           return _c("li", [
             _c(
               "button",

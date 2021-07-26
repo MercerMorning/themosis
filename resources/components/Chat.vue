@@ -5,10 +5,17 @@
       <input type="submit">
     </form>
 
+    <div style="width: 50%">
+      <ul>
+        <li v-for="user in usersData">
+          <button>{{ user.user_login }}</button>
+        </li>
+      </ul>
+    </div>
 
     <div style="width: 50%">
         <ul>
-          <li v-for="thread in JSON.parse(threadsData)">
+          <li v-for="thread in threadsData">
             <button v-bind:data-id="thread.id" v-on:click="openThread">{{ thread.subject }}</button>
           </li>
         </ul>
@@ -45,11 +52,13 @@ export default {
   },
   props: {
     threads: String,
+    users: String,
   },
   data: function () {
     {
       return {
-        threadsData: this.threads,
+        threadsData: JSON.parse(this.threads),
+        usersData: JSON.parse(this.users),
         threadBody: null,
         currentThread: null,
         threadMessages: null,
