@@ -11,7 +11,7 @@ class ChatController extends Controller
 {
     public function index()
     {
-
+        $users = User::all();
         $alreadyHaveDialog = [];
         $personalThreads = ThreadParticipant::query()
             ->join('threads', 'participants_table_message.thread_id', '=', 'threads.id')
@@ -34,13 +34,7 @@ class ChatController extends Controller
                 ],
             ];
         });
-        $users = User::query()
-            ->where('id', '!=', wp_get_current_user()->ID)
-            ->whereNotIn('id', $alreadyHaveDialog)
-            ->get()
-            ->map(function ($user) {
-                return ['user_id' => $user->ID];
-            });
+
 
         $publicThreads = User::find(wp_get_current_user()->ID)
             ->threads()
@@ -49,7 +43,7 @@ class ChatController extends Controller
                     return $item;
                 }
             })
-            ->mapWithKeys(function ($item) {
+            ->each(function ($item) {
                 return [
                     $item->id =>  [
                         'subject' => $item->subject,
@@ -60,12 +54,18 @@ class ChatController extends Controller
 
 //        $threads = $personalThreads->merge($publicThreads);
         $threads = array_merge($publicThreads->toArray(), $personalThreads->toArray());
-        $threads = $threads + $users->toArray();
 
-        dd($threads);
-//        return view('front.chat', [
-//            'threads' => $threads,
-//            'users' => $users,
-//        ]);
+        User::query()
+            ->where('id', '!=', wp_get_current_user()->ID)
+            ->whereNotIn('id', $alreadyHaveDialog)
+            ->get()
+            ->each(function ($user) use (&$threads){
+                $threads[] = ['user_id' => $user->ID];
+            });
+
+        return view('front.chat', [
+            'threads' => $threads,
+            'users' => $users->toArray(),
+        ]);
     }
 }
