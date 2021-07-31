@@ -3,9 +3,10 @@
 use Themosis\Support\Facades\Action;
 use Themosis\Support\Facades\Filter;
 
-//Action::add('wp_enqueue_scripts', function () {
-//   wp_enqueue_script('app', get_template_directory_uri() . '/assets/js/app.js', [], false, true);
-//});
+Action::add('wp_enqueue_scripts', function () {
+   wp_enqueue_script('app_js', get_template_directory_uri() . '/assets/js/app.js', [], false, true);
+   wp_enqueue_style('app_style', get_template_directory_uri() . '/assets/styles/style.css');
+});
 
 ///**
 // * Adds custom classes to the array of body classes.

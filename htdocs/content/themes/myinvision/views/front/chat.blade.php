@@ -7,5 +7,4 @@
                 >
                 </chat-component>
             </div>
-    </div>
 @endsection

@@ -1,44 +1,139 @@
 <template>
   <div class="chat-container">
-    <form v-on:submit.prevent="addThread" method="post" id="add-thread-form" action="chat/create_thread">
-      <input type="text" name="name" id="add-thread-text" required>
-      <input type="submit">
-    </form>
-
-    <div style="width: 50%">
-      <ul>
-        <li v-for="user in usersData">
-          <button>{{ user.user_login }}</button>
+    <div class="menu-threads">
+      <div class="menu-threads__current-user">
+        <a class="menu-threads__link current-user">
+          <img class="thread-link__participant_ava" src="/content/themes/myinvision/assets/images/person.png">
+          <div class="thread-link__current-user_name">
+            Phillip Torff
+          </div>
+        </a>
+      </div>
+      <ul class="menu-threads__list">
+        <li v-for="thread in threadsData" class="menu-threads__item">
+          <a v-bind:data-id="thread.id" class="menu-threads__link">
+            <div class="thread-link__dialog">
+              <div class="thread-link__content">
+                <span class="thread-participant_name">{{ thread.subject }}</span>
+                <span class="thread-participant_message">{{ thread.lastMessage }}</span>
+              </div>
+              <div class="thread-link__date-time">
+                <span>{{ thread.created_at }}</span>
+              </div>
+            </div>
+          </a>
         </li>
+<!--        <li class="menu-threads__item active">-->
+<!--          <a class="menu-threads__link">-->
+<!--            <img class="thread-link__participant_ava" src="/content/themes/myinvision/assets/images/person.png">-->
+<!--            <div class="thread-link__dialog">-->
+<!--              <div class="thread-link__content">-->
+<!--                <span class="thread-participant_name">Phillip Torff</span>-->
+<!--                <span class="thread-participant_message">Thank you, Phillip!</span>-->
+<!--              </div>-->
+<!--              <div class="thread-link__date-time">-->
+<!--                <span>17/06/2020</span>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </a>-->
+<!--        </li>-->
+<!--        <li class="menu-threads__item">-->
+<!--          <a class="menu-threads__link">-->
+<!--            <img class="thread-link__participant_ava" src="/content/themes/myinvision/assets/images/person.png">-->
+<!--            <div class="thread-link__dialog">-->
+<!--              <div class="thread-link__content">-->
+<!--                <span class="thread-participant_name">Phillip Torff</span>-->
+<!--                <span class="thread-participant_message">Thank you, Phillip!</span>-->
+<!--              </div>-->
+<!--              <div class="thread-link__date-time">-->
+<!--                <span>17/06/2020</span>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </a>-->
+<!--        </li>-->
       </ul>
     </div>
+    <div class="chat mobile-hidden">
+      <div class="chat__participant-chat">
+        <svg width="20" height="18">
+          <use xlink:href="/content/themes/myinvision/assets/images/previous.svg#previous"></use>
+        </svg>
+        <span>Phillip Torff</span>
+        <img class="" src="/content/themes/myinvision/assets/images/person.png">
+      </div>
+      <div class="chat-body">
+        <div class="chat-message__date">
+                <span>
+                    17.06.2021
+                </span>
+        </div>
+        <div class="chat-message__message chat-message__message_foreign-user">
+          <span class="chat-message__autor">Phillip Torff</span>
+          <div class="chat-message__message_message-content">
+            <img class="thread-link__participant_ava" src="/content/themes/myinvision/assets/images/person.png">
+            <div class="chat-message__user-messages">
+              <div class="chat-message__message_message-body">
+                <div class="chat-message__text">
+                  Хай
+                </div>
+                <div class="chat-message__time">11:53</div>
+              </div>
+              <div class="chat-message__message_message-body">
+                <div class="chat-message__text">
+                  Хай
+                </div>
+                <div class="chat-message__time">11:53</div>
+              </div>
+            </div>
 
-    <div style="width: 50%">
-        <ul>
-          <li v-for="thread in threadsData">
-            <button v-bind:data-id="thread.id" v-on:click="openThread">{{ thread.subject }}</button>
-          </li>
-        </ul>
+          </div>
+        </div>
+        <div class="chat-message__message chat-message__message_current-user">
+          <div class="chat-message__message_message-content">
+            <div class="chat-message__user-messages">
+              <div class="chat-message__message_message-body">
+                <div class="chat-message__text">
+                  Хай
+                </div>
+                <div class="chat-message__time">11:53</div>
+              </div>
+              <div class="chat-message__message_message-body">
+                <div class="chat-message__text">
+                  Хай
+                </div>
+                <div class="chat-message__time">11:53</div>
+              </div>
+            </div>
+            <img class="thread-link__participant_ava" src="/content/themes/myinvision/assets/images/person.png">
+          </div>
+        </div>
+      </div>
+      <form class="chat-footer">
+        <div class="chat-footer__input-wrpa">
+          <label class="chat-footer__input-file">
+            <svg width="20" height="18">
+              <use xlink:href="/content/themes/myinvision/assets/images/sprite.svg#icon-clip"></use>
+            </svg>
+            <input type="file" name="file">
+          </label>
+          <label class="chat-footer__input-text">
+            <textarea class="input-message" type="text" name="text" placeholder="Введите сообщение"></textarea>
+          </label>
+
+          <label class="chat-footer__send-message">
+            <button class="button chat-footer__button" type="submit">
+                            <span class="send-button_text">
+                                Отправить
+                            </span>
+            </button>
+            <svg width="20" height="18">
+              <use xlink:href="/content/themes/myinvision/assets/images/send.svg#send"></use>
+            </svg>
+          </label>
+        </div>
+      </form>
     </div>
 
-    <div style="width: 50%; float: right">
-      <div v-if="threadMessages">
-
-      </div>
-      <div v-else>
-        Здесь пока пусто
-      </div>
-    </div>
-    <ul style="width: 70%">
-      <li v-for="threadMessage in threadMessages">
-        {{ threadMessage.body }}
-      </li>
-    </ul>
-    <form action="" v-on:submit.prevent="sendMessage">
-      <input type="hidden" name="threadId" v-bind:value="currentThread">
-      <input type="text" name="body" id="message-input">
-      <input type="submit">
-    </form>
   </div>
 </template>
 
