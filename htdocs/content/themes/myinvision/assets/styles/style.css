@@ -14,12 +14,23 @@ src: url("./fonts/exotwo/exo2medium.ttf") format("truetype");
     overflow: hidden;
 }
 
+.chat-container a {
+    cursor: pointer;
+}
+
 .chat-container ul {
     list-style: none;
     padding: 0px;
 }
 
 .chat-body {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.chat-body label {
     margin-top: 20px;
     display: flex;
     flex-direction: column;

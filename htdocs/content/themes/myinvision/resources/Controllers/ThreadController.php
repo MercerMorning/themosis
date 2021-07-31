@@ -2,6 +2,7 @@
 namespace Theme\Controllers;
 
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Theme\Models\Thread;
@@ -17,7 +18,7 @@ class ThreadController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response(400);
+            return response('', 400);
         }
 
         $thread = Thread::create(['subject' => $request->get('name')]);
@@ -29,7 +30,7 @@ class ThreadController extends Controller
         if ($isSuccess) {
             return response($userThreads);
         }
-        return response(400);
+        return response('', 400);
     }
 
     public function inviteParticipant(Request $request)
@@ -40,7 +41,7 @@ class ThreadController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response(400);
+            return response('', 400);
         }
 
         return ThreadParticipant::create(['thread_id' => $request->get('thread_id'),
@@ -50,19 +51,24 @@ class ThreadController extends Controller
 
     public function getThreadMessages(Request $request)
     {
-//        return $request->all();
         $validator = Validator::make($request->all(), [
             'thread_id' => 'required|exists:threads,id',
         ]);
 
         if ($validator->fails()) {
-            return response(400);
+            return response('', 400);
         }
 
         $threadMessages = Thread::find($request->get('thread_id'))->messages();
+        $threadMessages = $threadMessages->map(function ($item) {
+            $item->date = $item->created_at->format('d.m.Y');
+            return $item;
+        })->groupBy('date');
+
+
         if ($threadMessages) {
-            return response(Thread::find($request->get('thread_id'))->messages());
+            return response($threadMessages);
         }
-         return response(400);
+         return response('', 400);
     }
 }

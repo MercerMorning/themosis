@@ -5,17 +5,21 @@
         <a class="menu-threads__link current-user">
           <img class="thread-link__participant_ava" src="/content/themes/myinvision/assets/images/person.png">
           <div class="thread-link__current-user_name">
-            Phillip Torff
+            {{ usersData[usersData.current_user_id].first_name + ' ' +  usersData[usersData.current_user_id].last_name}}
           </div>
         </a>
       </div>
       <ul class="menu-threads__list">
-        <li v-for="thread in threadsData" class="menu-threads__item">
-          <a v-bind:data-id="thread.id" class="menu-threads__link">
+        <li v-for="thread in threadsData"
+            v-bind:class="[thread.id === JSON.parse(currentThread)
+               ? 'menu-threads__item active'
+               : 'menu-threads__item']">
+
+          <a v-bind:data-id="thread.id" class="menu-threads__link" v-on:click="openThread">
             <div class="thread-link__dialog">
               <div class="thread-link__content">
                 <span class="thread-participant_name">{{ thread.subject }}</span>
-                <span class="thread-participant_message">{{ thread.lastMessage }}</span>
+                <span class="thread-participant_message">{{ thread.last_message }}</span>
               </div>
               <div class="thread-link__date-time">
                 <span>{{ thread.created_at }}</span>
@@ -62,54 +66,39 @@
         <img class="" src="/content/themes/myinvision/assets/images/person.png">
       </div>
       <div class="chat-body">
-        <div class="chat-message__date">
+
+        <label v-for="(messages, date) in threadMessages">
+          <div class="chat-message__date">
                 <span>
-                    17.06.2021
+                    {{ date }}
                 </span>
-        </div>
-        <div class="chat-message__message chat-message__message_foreign-user">
-          <span class="chat-message__autor">Phillip Torff</span>
-          <div class="chat-message__message_message-content">
-            <img class="thread-link__participant_ava" src="/content/themes/myinvision/assets/images/person.png">
-            <div class="chat-message__user-messages">
-              <div class="chat-message__message_message-body">
-                <div class="chat-message__text">
-                  Хай
-                </div>
-                <div class="chat-message__time">11:53</div>
-              </div>
-              <div class="chat-message__message_message-body">
-                <div class="chat-message__text">
-                  Хай
-                </div>
-                <div class="chat-message__time">11:53</div>
-              </div>
-            </div>
 
           </div>
-        </div>
-        <div class="chat-message__message chat-message__message_current-user">
-          <div class="chat-message__message_message-content">
-            <div class="chat-message__user-messages">
-              <div class="chat-message__message_message-body">
-                <div class="chat-message__text">
-                  Хай
+          <div v-for="message in messages"
+               v-bind:class="[message.user_id === usersData.current_user_id
+               ? 'chat-message__message chat-message__message_current-user'
+               : 'chat-message__message chat-message__message_foreign-user']">
+            <span v-if="message.user_id !== usersData.current_user_id" class="chat-message__autor">
+              {{ usersData[message.user_id].first_name + ' ' + usersData[message.user_id].last_name }}
+            </span>
+            <div class="chat-message__message_message-content">
+              <img v-if="message.user_id !== usersData.current_user_id" class="thread-link__participant_ava" src="/content/themes/myinvision/assets/images/person.png">
+              <div class="chat-message__user-messages">
+                <div class="chat-message__message_message-body">
+                  <div class="chat-message__text">
+                    {{ message.body }}
+                  </div>
+                  <div class="chat-message__time">{{ message.created_at }}</div>
                 </div>
-                <div class="chat-message__time">11:53</div>
               </div>
-              <div class="chat-message__message_message-body">
-                <div class="chat-message__text">
-                  Хай
-                </div>
-                <div class="chat-message__time">11:53</div>
-              </div>
+
             </div>
-            <img class="thread-link__participant_ava" src="/content/themes/myinvision/assets/images/person.png">
           </div>
-        </div>
+        </label>
       </div>
-      <form class="chat-footer">
+      <form class="chat-footer" v-on:submit.prevent="sendMessage">
         <div class="chat-footer__input-wrpa">
+          <input type="hidden" name="threadId" v-bind:value="currentThread">
           <label class="chat-footer__input-file">
             <svg width="20" height="18">
               <use xlink:href="/content/themes/myinvision/assets/images/sprite.svg#icon-clip"></use>
@@ -117,7 +106,7 @@
             <input type="file" name="file">
           </label>
           <label class="chat-footer__input-text">
-            <textarea class="input-message" type="text" name="text" placeholder="Введите сообщение"></textarea>
+            <textarea class="input-message" type="text" name="body" placeholder="Введите сообщение"></textarea>
           </label>
 
           <label class="chat-footer__send-message">
@@ -139,24 +128,58 @@
 
 
 <script>
+function getCookie(name) {
+  let matches = document.cookie.match(new RegExp(
+      "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+  ));
+  return matches ? decodeURIComponent(matches[1]) : JSON.stringify(null);
+}
+
+function setCookie(name, value, options = {}) {
+
+  options = {
+    path: '/',
+    // при необходимости добавьте другие значения по умолчанию
+    ...options
+  };
+
+  if (options.expires instanceof Date) {
+    options.expires = options.expires.toUTCString();
+  }
+
+  let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(value);
+
+  for (let optionKey in options) {
+    updatedCookie += "; " + optionKey;
+    let optionValue = options[optionKey];
+    if (optionValue !== true) {
+      updatedCookie += "=" + optionValue;
+    }
+  }
+
+  document.cookie = updatedCookie;
+}
+
 export default {
   mounted: function(){
-    // console.log(this.token)
-    console.log("Hello Vue!");
-    // console.log(this.threads());
+    setInterval(function(){
+        axios.get('chat/get_thread?thread_id=' + JSON.parse(getCookie('currentThread'))).then( response => {
+          setCookie('threadMessages',  JSON.stringify(response.data));
+        });
+    }, 1000);
   },
   props: {
     threads: String,
     users: String,
+    currentUser: String,
   },
   data: function () {
     {
       return {
         threadsData: JSON.parse(this.threads),
         usersData: JSON.parse(this.users),
-        threadBody: null,
-        currentThread: null,
-        threadMessages: null,
+        currentThread: JSON.parse(getCookie('currentThread')) ?? null,
+        threadMessages: JSON.parse(getCookie('threadMessages')) ?? null,
       }
     }
   },
@@ -182,11 +205,15 @@ export default {
       })
     },
     openThread: function (event) {
+      console.log(event.target.dataset.id)
       axios.get('chat/get_thread?thread_id=' +  event.target.dataset.id).then( response => {
-        console.log(response.data)
         this.threadMessages = response.data
         this.currentThread = event.target.dataset.id;
+        setCookie('currentThread',  JSON.stringify(event.target.dataset.id))
+        setCookie('threadMessages',  JSON.stringify(response.data))
       })
+
+      console.log(this. threadMessages);
     }
   }
 }

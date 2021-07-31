@@ -1955,6 +1955,12 @@ module.exports = {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 //
 //
 //
@@ -2084,34 +2090,57 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
+function getCookie(name) {
+  var matches = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"));
+  return matches ? decodeURIComponent(matches[1]) : JSON.stringify(null);
+}
+
+function setCookie(name, value) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+  options = _objectSpread({
+    path: '/'
+  }, options);
+
+  if (options.expires instanceof Date) {
+    options.expires = options.expires.toUTCString();
+  }
+
+  var updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(value);
+
+  for (var optionKey in options) {
+    updatedCookie += "; " + optionKey;
+    var optionValue = options[optionKey];
+
+    if (optionValue !== true) {
+      updatedCookie += "=" + optionValue;
+    }
+  }
+
+  document.cookie = updatedCookie;
+}
+
 /* harmony default export */ __webpack_exports__["default"] = ({
   mounted: function mounted() {
-    // console.log(this.token)
-    console.log("Hello Vue!"); // console.log(this.threads());
+    setInterval(function () {
+      axios.get('chat/get_thread?thread_id=' + JSON.parse(getCookie('currentThread'))).then(function (response) {
+        setCookie('threadMessages', JSON.stringify(response.data));
+      });
+    }, 1000);
   },
   props: {
     threads: String,
-    users: String
+    users: String,
+    currentUser: String
   },
   data: function data() {
     {
+      var _JSON$parse, _JSON$parse2;
+
       return {
         threadsData: JSON.parse(this.threads),
         usersData: JSON.parse(this.users),
-        threadBody: null,
-        currentThread: null,
-        threadMessages: null
+        currentThread: (_JSON$parse = JSON.parse(getCookie('currentThread'))) !== null && _JSON$parse !== void 0 ? _JSON$parse : null,
+        threadMessages: (_JSON$parse2 = JSON.parse(getCookie('threadMessages'))) !== null && _JSON$parse2 !== void 0 ? _JSON$parse2 : null
       };
     }
   },
@@ -2143,11 +2172,14 @@ __webpack_require__.r(__webpack_exports__);
     openThread: function openThread(event) {
       var _this3 = this;
 
+      console.log(event.target.dataset.id);
       axios.get('chat/get_thread?thread_id=' + event.target.dataset.id).then(function (response) {
-        console.log(response.data);
         _this3.threadMessages = response.data;
         _this3.currentThread = event.target.dataset.id;
+        setCookie('currentThread', JSON.stringify(event.target.dataset.id));
+        setCookie('threadMessages', JSON.stringify(response.data));
       });
+      console.log(this.threadMessages);
     }
   }
 });
@@ -2639,38 +2671,72 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "chat-container" }, [
     _c("div", { staticClass: "menu-threads" }, [
-      _vm._m(0),
+      _c("div", { staticClass: "menu-threads__current-user" }, [
+        _c("a", { staticClass: "menu-threads__link current-user" }, [
+          _c("img", {
+            staticClass: "thread-link__participant_ava",
+            attrs: {
+              src: "/content/themes/myinvision/assets/images/person.png"
+            }
+          }),
+          _vm._v(" "),
+          _c("div", { staticClass: "thread-link__current-user_name" }, [
+            _vm._v(
+              "\n            " +
+                _vm._s(
+                  _vm.usersData[_vm.usersData.current_user_id].first_name +
+                    " " +
+                    _vm.usersData[_vm.usersData.current_user_id].last_name
+                ) +
+                "\n          "
+            )
+          ])
+        ])
+      ]),
       _vm._v(" "),
       _c(
         "ul",
         { staticClass: "menu-threads__list" },
         _vm._l(_vm.threadsData, function(thread) {
-          return _c("li", { staticClass: "menu-threads__item" }, [
-            _c(
-              "a",
-              {
-                staticClass: "menu-threads__link",
-                attrs: { "data-id": thread.id }
-              },
-              [
-                _c("div", { staticClass: "thread-link__dialog" }, [
-                  _c("div", { staticClass: "thread-link__content" }, [
-                    _c("span", { staticClass: "thread-participant_name" }, [
-                      _vm._v(_vm._s(thread.subject))
+          return _c(
+            "li",
+            {
+              class: [
+                thread.id === JSON.parse(_vm.currentThread)
+                  ? "menu-threads__item active"
+                  : "menu-threads__item"
+              ]
+            },
+            [
+              _c(
+                "a",
+                {
+                  staticClass: "menu-threads__link",
+                  attrs: { "data-id": thread.id },
+                  on: { click: _vm.openThread }
+                },
+                [
+                  _c("div", { staticClass: "thread-link__dialog" }, [
+                    _c("div", { staticClass: "thread-link__content" }, [
+                      _c("span", { staticClass: "thread-participant_name" }, [
+                        _vm._v(_vm._s(thread.subject))
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "span",
+                        { staticClass: "thread-participant_message" },
+                        [_vm._v(_vm._s(thread.last_message))]
+                      )
                     ]),
                     _vm._v(" "),
-                    _c("span", { staticClass: "thread-participant_message" }, [
-                      _vm._v(_vm._s(thread.lastMessage))
+                    _c("div", { staticClass: "thread-link__date-time" }, [
+                      _c("span", [_vm._v(_vm._s(thread.created_at))])
                     ])
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "thread-link__date-time" }, [
-                    _c("span", [_vm._v(_vm._s(thread.created_at))])
                   ])
-                ])
-              ]
-            )
-          ])
+                ]
+              )
+            ]
+          )
         }),
         0
       )
@@ -2694,39 +2760,154 @@ var render = function() {
         })
       ]),
       _vm._v(" "),
-      _vm._m(1),
-      _vm._v(" "),
-      _c("form", { staticClass: "chat-footer" }, [
-        _c("div", { staticClass: "chat-footer__input-wrpa" }, [
-          _c("label", { staticClass: "chat-footer__input-file" }, [
-            _c("svg", { attrs: { width: "20", height: "18" } }, [
-              _c("use", {
-                attrs: {
-                  "xlink:href":
-                    "/content/themes/myinvision/assets/images/sprite.svg#icon-clip"
-                }
+      _c(
+        "div",
+        { staticClass: "chat-body" },
+        _vm._l(_vm.threadMessages, function(messages, date) {
+          return _c(
+            "label",
+            [
+              _c("div", { staticClass: "chat-message__date" }, [
+                _c("span", [
+                  _vm._v(
+                    "\n                    " +
+                      _vm._s(date) +
+                      "\n                "
+                  )
+                ])
+              ]),
+              _vm._v(" "),
+              _vm._l(messages, function(message) {
+                return _c(
+                  "div",
+                  {
+                    class: [
+                      message.user_id === _vm.usersData.current_user_id
+                        ? "chat-message__message chat-message__message_current-user"
+                        : "chat-message__message chat-message__message_foreign-user"
+                    ]
+                  },
+                  [
+                    message.user_id !== _vm.usersData.current_user_id
+                      ? _c("span", { staticClass: "chat-message__autor" }, [
+                          _vm._v(
+                            "\n              " +
+                              _vm._s(
+                                _vm.usersData[message.user_id].first_name +
+                                  " " +
+                                  _vm.usersData[message.user_id].last_name
+                              ) +
+                              "\n            "
+                          )
+                        ])
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _c(
+                      "div",
+                      { staticClass: "chat-message__message_message-content" },
+                      [
+                        message.user_id !== _vm.usersData.current_user_id
+                          ? _c("img", {
+                              staticClass: "thread-link__participant_ava",
+                              attrs: {
+                                src:
+                                  "/content/themes/myinvision/assets/images/person.png"
+                              }
+                            })
+                          : _vm._e(),
+                        _vm._v(" "),
+                        _c(
+                          "div",
+                          { staticClass: "chat-message__user-messages" },
+                          [
+                            _c(
+                              "div",
+                              {
+                                staticClass:
+                                  "chat-message__message_message-body"
+                              },
+                              [
+                                _c(
+                                  "div",
+                                  { staticClass: "chat-message__text" },
+                                  [
+                                    _vm._v(
+                                      "\n                    " +
+                                        _vm._s(message.body) +
+                                        "\n                  "
+                                    )
+                                  ]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "div",
+                                  { staticClass: "chat-message__time" },
+                                  [_vm._v(_vm._s(message.created_at))]
+                                )
+                              ]
+                            )
+                          ]
+                        )
+                      ]
+                    )
+                  ]
+                )
               })
+            ],
+            2
+          )
+        }),
+        0
+      ),
+      _vm._v(" "),
+      _c(
+        "form",
+        {
+          staticClass: "chat-footer",
+          on: {
+            submit: function($event) {
+              $event.preventDefault()
+              return _vm.sendMessage.apply(null, arguments)
+            }
+          }
+        },
+        [
+          _c("div", { staticClass: "chat-footer__input-wrpa" }, [
+            _c("input", {
+              attrs: { type: "hidden", name: "threadId" },
+              domProps: { value: _vm.currentThread }
+            }),
+            _vm._v(" "),
+            _c("label", { staticClass: "chat-footer__input-file" }, [
+              _c("svg", { attrs: { width: "20", height: "18" } }, [
+                _c("use", {
+                  attrs: {
+                    "xlink:href":
+                      "/content/themes/myinvision/assets/images/sprite.svg#icon-clip"
+                  }
+                })
+              ]),
+              _vm._v(" "),
+              _c("input", { attrs: { type: "file", name: "file" } })
             ]),
             _vm._v(" "),
-            _c("input", { attrs: { type: "file", name: "file" } })
-          ]),
-          _vm._v(" "),
-          _vm._m(2),
-          _vm._v(" "),
-          _c("label", { staticClass: "chat-footer__send-message" }, [
-            _vm._m(3),
+            _vm._m(0),
             _vm._v(" "),
-            _c("svg", { attrs: { width: "20", height: "18" } }, [
-              _c("use", {
-                attrs: {
-                  "xlink:href":
-                    "/content/themes/myinvision/assets/images/send.svg#send"
-                }
-              })
+            _c("label", { staticClass: "chat-footer__send-message" }, [
+              _vm._m(1),
+              _vm._v(" "),
+              _c("svg", { attrs: { width: "20", height: "18" } }, [
+                _c("use", {
+                  attrs: {
+                    "xlink:href":
+                      "/content/themes/myinvision/assets/images/send.svg#send"
+                  }
+                })
+              ])
             ])
           ])
-        ])
-      ])
+        ]
+      )
     ])
   ])
 }
@@ -2735,123 +2916,10 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "menu-threads__current-user" }, [
-      _c("a", { staticClass: "menu-threads__link current-user" }, [
-        _c("img", {
-          staticClass: "thread-link__participant_ava",
-          attrs: { src: "/content/themes/myinvision/assets/images/person.png" }
-        }),
-        _vm._v(" "),
-        _c("div", { staticClass: "thread-link__current-user_name" }, [
-          _vm._v("\n            Phillip Torff\n          ")
-        ])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "chat-body" }, [
-      _c("div", { staticClass: "chat-message__date" }, [
-        _c("span", [
-          _vm._v("\n                    17.06.2021\n                ")
-        ])
-      ]),
-      _vm._v(" "),
-      _c(
-        "div",
-        {
-          staticClass:
-            "chat-message__message chat-message__message_foreign-user"
-        },
-        [
-          _c("span", { staticClass: "chat-message__autor" }, [
-            _vm._v("Phillip Torff")
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "chat-message__message_message-content" }, [
-            _c("img", {
-              staticClass: "thread-link__participant_ava",
-              attrs: {
-                src: "/content/themes/myinvision/assets/images/person.png"
-              }
-            }),
-            _vm._v(" "),
-            _c("div", { staticClass: "chat-message__user-messages" }, [
-              _c("div", { staticClass: "chat-message__message_message-body" }, [
-                _c("div", { staticClass: "chat-message__text" }, [
-                  _vm._v("\n                  Хай\n                ")
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "chat-message__time" }, [
-                  _vm._v("11:53")
-                ])
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "chat-message__message_message-body" }, [
-                _c("div", { staticClass: "chat-message__text" }, [
-                  _vm._v("\n                  Хай\n                ")
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "chat-message__time" }, [
-                  _vm._v("11:53")
-                ])
-              ])
-            ])
-          ])
-        ]
-      ),
-      _vm._v(" "),
-      _c(
-        "div",
-        {
-          staticClass:
-            "chat-message__message chat-message__message_current-user"
-        },
-        [
-          _c("div", { staticClass: "chat-message__message_message-content" }, [
-            _c("div", { staticClass: "chat-message__user-messages" }, [
-              _c("div", { staticClass: "chat-message__message_message-body" }, [
-                _c("div", { staticClass: "chat-message__text" }, [
-                  _vm._v("\n                  Хай\n                ")
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "chat-message__time" }, [
-                  _vm._v("11:53")
-                ])
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "chat-message__message_message-body" }, [
-                _c("div", { staticClass: "chat-message__text" }, [
-                  _vm._v("\n                  Хай\n                ")
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "chat-message__time" }, [
-                  _vm._v("11:53")
-                ])
-              ])
-            ]),
-            _vm._v(" "),
-            _c("img", {
-              staticClass: "thread-link__participant_ava",
-              attrs: {
-                src: "/content/themes/myinvision/assets/images/person.png"
-              }
-            })
-          ])
-        ]
-      )
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
     return _c("label", { staticClass: "chat-footer__input-text" }, [
       _c("textarea", {
         staticClass: "input-message",
-        attrs: { type: "text", name: "text", placeholder: "Введите сообщение" }
+        attrs: { type: "text", name: "body", placeholder: "Введите сообщение" }
       })
     ])
   },

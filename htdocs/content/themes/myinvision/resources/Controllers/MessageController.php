@@ -19,8 +19,7 @@ class MessageController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $validator->errors();
-            return response(400);
+            return response($validator->errors(), 400);
         }
 
         $message = ThreadMessage::create([
@@ -28,9 +27,15 @@ class MessageController extends Controller
             'thread_id' => $request->get('thread_id'),
             'body' => $request->get('body')]);
 
+        $threadMessages = Thread::find($request->get('thread_id'))->messages();
+        $threadMessages = $threadMessages->map(function ($item) {
+            $item->date = $item->created_at->format('d.m.Y');
+            return $item;
+        })->groupBy('date');
+
         if ($message) {
-            return Thread::find($request->get('thread_id'))->messages();
+            return $threadMessages;
         }
-        return response(400);
+        return response('', 400);
     }
 }

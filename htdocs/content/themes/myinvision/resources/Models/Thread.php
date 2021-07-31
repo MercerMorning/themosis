@@ -10,6 +10,11 @@ class Thread extends Model
 
     protected $fillable = ['subject'];
 
+    protected $casts = [
+        'created_at' => 'datetime:d.m.Y H:i',
+        'updated_at' => 'datetime:d.m.Y H:i',
+    ];
+
     public function messages()
     {
         return $this->hasMany(ThreadMessage::class, 'thread_id', 'id')->get();

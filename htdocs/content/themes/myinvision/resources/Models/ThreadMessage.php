@@ -10,6 +10,11 @@ class ThreadMessage extends Model
 
     protected $fillable = ['body', 'thread_id', 'user_id'];
 
+    protected $casts = [
+        'created_at' => 'datetime: H:i',
+        'updated_at' => 'datetime: H:i',
+    ];
+
     public function messagePresenter()
     {
         $messageUser = User::find($this->user_id);
