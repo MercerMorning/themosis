@@ -2076,6 +2076,39 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 function getCookie(name) {
   var matches = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"));
   return matches ? decodeURIComponent(matches[1]) : JSON.stringify(null);
@@ -2107,11 +2140,7 @@ function setCookie(name, value) {
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   mounted: function mounted() {
-    setInterval(function () {
-      axios.get('chat/get_thread?thread_id=' + JSON.parse(getCookie('currentThread'))).then(function (response) {
-        setCookie('threadMessages', JSON.stringify(response.data));
-      });
-    }, 1000);
+    this.invervalRecievingThreadData();
   },
   props: {
     threads: String,
@@ -2126,7 +2155,9 @@ function setCookie(name, value) {
         threadsData: JSON.parse(this.threads),
         usersData: JSON.parse(this.users),
         currentThread: (_JSON$parse = JSON.parse(getCookie('currentThread'))) !== null && _JSON$parse !== void 0 ? _JSON$parse : null,
-        threadMessages: (_JSON$parse2 = JSON.parse(getCookie('threadMessages'))) !== null && _JSON$parse2 !== void 0 ? _JSON$parse2 : null
+        threadMessages: (_JSON$parse2 = JSON.parse(getCookie('threadMessages'))) !== null && _JSON$parse2 !== void 0 ? _JSON$parse2 : null,
+        createNewTheme: false,
+        newThread: null
       };
     }
   },
@@ -2184,6 +2215,7 @@ function setCookie(name, value) {
         });
       }
 
+      var thread;
       axios.get('chat/get_thread?thread_id=' + event.target.dataset.id).then(function (response) {
         _this3.threadMessages = response.data;
         _this3.currentThread = event.target.dataset.id;
@@ -2191,6 +2223,43 @@ function setCookie(name, value) {
         setCookie('threadMessages', JSON.stringify(response.data));
       });
       console.log(this.threadMessages);
+    },
+    invervalRecievingThreadData: function invervalRecievingThreadData() {
+      var _this4 = this;
+
+      setInterval(function () {
+        axios.get('chat/get_thread?thread_id=' + JSON.parse(getCookie('currentThread'))).then(function (response) {
+          _this4.threadMessages = response.data;
+          _this4.currentThread = JSON.parse(getCookie('currentThread'));
+        });
+        axios.get('chat/get_threads').then(function (response) {
+          _this4.threadsData = response.data;
+        });
+      }, 1000);
+    },
+    openCreateThemeModal: function openCreateThemeModal() {
+      this.createNewTheme = true;
+    },
+    closeCreateThemeModal: function closeCreateThemeModal() {
+      this.createNewTheme = false;
+    },
+    createNewThemeFunc: function createNewThemeFunc(event) {
+      var _this5 = this;
+
+      axios.post('chat/create_thread/', {
+        'name': new FormData(event.target).get('name')
+      }).then(function (response) {
+        // this.threadsData = response.data
+        _this5.newThread = response.data.new_thread_id;
+        console.log(_this5.newThread);
+        axios.post('chat/invite_to_thread/', {
+          'thread_id': _this5.newThread,
+          'participants_id': new FormData(event.target).get('participants_id')
+        }).then(function (response) {// this.threadsData = response.data
+        });
+        _this5.newThread = null;
+        _this5.createNewTheme = false;
+      });
     }
   }
 });
@@ -2681,6 +2750,86 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "chat-container" }, [
+    _vm.createNewTheme
+      ? _c("div", { staticClass: "popups active" }, [
+          _c("div", { staticClass: "popups__container-wrap" }, [
+            _c(
+              "button",
+              {
+                staticClass: "popups__close",
+                on: { click: _vm.closeCreateThemeModal }
+              },
+              [
+                _c("svg", { attrs: { width: "20", height: "20" } }, [
+                  _c("use", {
+                    attrs: {
+                      "xlink:href":
+                        "/content/themes/myinvision/assets/images/close.svg#icon-close"
+                    }
+                  })
+                ])
+              ]
+            ),
+            _vm._v(" "),
+            _c("div", { staticClass: "popups__container" }, [
+              _c("h2", { staticClass: "popups__h" }, [
+                _vm._v("Создайте новую тему")
+              ]),
+              _vm._v(" "),
+              _c(
+                "form",
+                {
+                  staticClass: "popups__inputs",
+                  attrs: { action: "#", method: "post" },
+                  on: {
+                    submit: function($event) {
+                      $event.preventDefault()
+                      return _vm.createNewThemeFunc.apply(null, arguments)
+                    }
+                  }
+                },
+                [
+                  _vm._m(0),
+                  _vm._v(" "),
+                  _c("label", { staticClass: "input" }, [
+                    _c(
+                      "span",
+                      {
+                        staticClass: "input__placeholder",
+                        attrs: { required: "" }
+                      },
+                      [_vm._v("Участники")]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "select",
+                      { attrs: { name: "participants_id", multiple: "" } },
+                      _vm._l(_vm.usersData, function(user) {
+                        return _c("option", { domProps: { value: user.ID } }, [
+                          _vm._v(
+                            "\n                      " +
+                              _vm._s(user.first_name + " " + user.last_name) +
+                              "\n                  "
+                          )
+                        ])
+                      }),
+                      0
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("input", { attrs: { type: "submit", value: "Создать" } })
+                ]
+              )
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", {
+            staticClass: "popups__close-area",
+            attrs: { "data-popups-close": "" }
+          })
+        ])
+      : _vm._e(),
+    _vm._v(" "),
     _c("div", { staticClass: "menu-threads" }, [
       _c("div", { staticClass: "menu-threads__current-user" }, [
         _c("a", { staticClass: "menu-threads__link current-user" }, [
@@ -2706,68 +2855,85 @@ var render = function() {
       _c(
         "ul",
         { staticClass: "menu-threads__list" },
-        _vm._l(_vm.threadsData, function(thread) {
-          return _c(
-            "li",
-            {
-              class: [
-                thread.id === JSON.parse(_vm.currentThread)
-                  ? "menu-threads__item active"
-                  : "menu-threads__item"
-              ]
-            },
-            [
-              _c(
-                "a",
-                {
-                  staticClass: "menu-threads__link",
-                  attrs: {
-                    "data-id": thread.id,
-                    "data-participantId": thread.participant_id
+        [
+          _c("li", { staticClass: "menu-threads__item" }, [
+            _c(
+              "a",
+              {
+                staticClass: "menu-threads__link",
+                on: { click: _vm.openCreateThemeModal }
+              },
+              [_vm._v("\n            Создать новую тему\n          ")]
+            )
+          ]),
+          _vm._v(" "),
+          _vm._l(_vm.threadsData, function(thread) {
+            return _c(
+              "li",
+              {
+                class: [
+                  thread.id === JSON.parse(_vm.currentThread)
+                    ? "menu-threads__item active"
+                    : "menu-threads__item"
+                ]
+              },
+              [
+                _c(
+                  "a",
+                  {
+                    staticClass: "menu-threads__link",
+                    attrs: {
+                      "data-id": thread.id,
+                      "data-participantId": thread.participant_id
+                    },
+                    on: { click: _vm.openThread }
                   },
-                  on: { click: _vm.openThread }
-                },
-                [
-                  thread.participant_id
-                    ? _c("img", {
-                        staticClass: "thread-link__participant_ava",
-                        attrs: { src: _vm.usersData[thread.participant_id].ava }
-                      })
-                    : _vm._e(),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "thread-link__dialog" }, [
-                    _c("div", { staticClass: "thread-link__content" }, [
-                      _c("span", { staticClass: "thread-participant_name" }, [
-                        _vm._v(
-                          "\n                  " +
-                            _vm._s(
-                              thread.participant_id
-                                ? _vm.users[thread.participant_id].first_name +
-                                    " " +
-                                    _vm.users[thread.participant_id].last_name
-                                : thread.subject
-                            ) +
-                            "\n                "
+                  [
+                    thread.participant_id
+                      ? _c("img", {
+                          staticClass: "thread-link__participant_ava",
+                          attrs: {
+                            src: _vm.usersData[thread.participant_id].ava
+                          }
+                        })
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "thread-link__dialog" }, [
+                      _c("div", { staticClass: "thread-link__content" }, [
+                        _c("span", { staticClass: "thread-participant_name" }, [
+                          _vm._v(
+                            "\n                  " +
+                              _vm._s(
+                                thread.participant_id
+                                  ? _vm.usersData[thread.participant_id]
+                                      .first_name +
+                                      " " +
+                                      _vm.usersData[thread.participant_id]
+                                        .last_name
+                                  : thread.subject
+                              ) +
+                              "\n                "
+                          )
+                        ]),
+                        _vm._v(" "),
+                        _c(
+                          "span",
+                          { staticClass: "thread-participant_message" },
+                          [_vm._v(_vm._s(thread.last_message))]
                         )
                       ]),
                       _vm._v(" "),
-                      _c(
-                        "span",
-                        { staticClass: "thread-participant_message" },
-                        [_vm._v(_vm._s(thread.last_message))]
-                      )
-                    ]),
-                    _vm._v(" "),
-                    _c("div", { staticClass: "thread-link__date-time" }, [
-                      _c("span", [_vm._v(_vm._s(thread.datetime))])
+                      _c("div", { staticClass: "thread-link__date-time" }, [
+                        _c("span", [_vm._v(_vm._s(thread.datetime))])
+                      ])
                     ])
-                  ])
-                ]
-              )
-            ]
-          )
-        }),
-        0
+                  ]
+                )
+              ]
+            )
+          })
+        ],
+        2
       )
     ]),
     _vm._v(" "),
@@ -2918,10 +3084,10 @@ var render = function() {
               _c("input", { attrs: { type: "file", name: "file" } })
             ]),
             _vm._v(" "),
-            _vm._m(0),
+            _vm._m(1),
             _vm._v(" "),
             _c("label", { staticClass: "chat-footer__send-message" }, [
-              _vm._m(1),
+              _vm._m(2),
               _vm._v(" "),
               _c("svg", { attrs: { width: "20", height: "18" } }, [
                 _c("use", {
@@ -2939,6 +3105,20 @@ var render = function() {
   ])
 }
 var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("label", { staticClass: "input" }, [
+      _c(
+        "span",
+        { staticClass: "input__placeholder", attrs: { required: "" } },
+        [_vm._v("Название темы*")]
+      ),
+      _vm._v(" "),
+      _c("input", { attrs: { type: "text", name: "name" } })
+    ])
+  },
   function() {
     var _vm = this
     var _h = _vm.$createElement

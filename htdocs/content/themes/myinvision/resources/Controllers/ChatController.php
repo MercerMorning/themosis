@@ -15,6 +15,7 @@ class ChatController extends Controller
     public function index()
     {
         $threadsAndUsers = ThreadsListService::getWholeList();
+//        dd($threadsAndUsers);
         return view('front.chat', [
 //            'currentUser' => json_encode($currentUser->toArray()),
             'threads' => json_encode($threadsAndUsers['threads']),

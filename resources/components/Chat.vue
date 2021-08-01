@@ -1,5 +1,33 @@
 <template>
   <div class="chat-container">
+    <div v-if="createNewTheme"  class="popups active">
+        <div class="popups__container-wrap">
+          <button class="popups__close" v-on:click="closeCreateThemeModal">
+            <svg width="20" height="20">
+              <use xlink:href="/content/themes/myinvision/assets/images/close.svg#icon-close"></use>
+            </svg>
+          </button>
+          <div class="popups__container">
+            <h2 class="popups__h">Создайте новую тему</h2>
+            <form action="#" method="post" class="popups__inputs" v-on:submit.prevent="createNewThemeFunc">
+              <label class="input">
+                <span class="input__placeholder" required>Название темы*</span>
+                <input type="text" name="name">
+              </label>
+              <label class="input">
+                <span class="input__placeholder" required>Участники</span>
+                <select name="participants_id" multiple>
+                  <option v-for="user in usersData" v-bind:value="user.ID">
+                      {{ user.first_name + ' ' + user.last_name }}
+                  </option>
+                </select>
+              </label>
+              <input type="submit" value="Создать">
+            </form>
+          </div>
+        </div>
+        <div class="popups__close-area" data-popups-close=""></div>
+      </div>
     <div class="menu-threads">
       <div class="menu-threads__current-user">
         <a class="menu-threads__link current-user">
@@ -11,6 +39,11 @@
         </a>
       </div>
       <ul class="menu-threads__list">
+        <li class="menu-threads__item">
+          <a class="menu-threads__link" v-on:click="openCreateThemeModal">
+            Создать новую тему
+          </a>
+        </li>
         <li v-for="thread in threadsData"
             v-bind:class="[thread.id === JSON.parse(currentThread)
                ? 'menu-threads__item active'
@@ -27,7 +60,7 @@
               <div class="thread-link__content">
                 <span class="thread-participant_name">
                   {{ thread.participant_id
-                    ? users[thread.participant_id].first_name + ' ' + users[thread.participant_id].last_name
+                    ? usersData[thread.participant_id].first_name + ' ' + usersData[thread.participant_id].last_name
                     : thread.subject }}
                 </span>
                 <span class="thread-participant_message">{{ thread.last_message }}</span>
@@ -148,11 +181,7 @@ function setCookie(name, value, options = {}) {
 
 export default {
   mounted: function(){
-    setInterval(function(){
-        axios.get('chat/get_thread?thread_id=' + JSON.parse(getCookie('currentThread'))).then( response => {
-          setCookie('threadMessages',  JSON.stringify(response.data));
-        });
-    }, 1000);
+      this.invervalRecievingThreadData()
   },
   props: {
     threads: String,
@@ -166,6 +195,8 @@ export default {
         usersData: JSON.parse(this.users),
         currentThread: JSON.parse(getCookie('currentThread')) ?? null,
         threadMessages: JSON.parse(getCookie('threadMessages')) ?? null,
+        createNewTheme: false,
+        newThread: null
       }
     }
   },
@@ -218,6 +249,7 @@ export default {
           this.threadsData = response.data
         })
       }
+      let thread
       axios.get('chat/get_thread?thread_id=' +  event.target.dataset.id).then( response => {
         this.threadMessages = response.data
         this.currentThread = event.target.dataset.id;
@@ -226,6 +258,43 @@ export default {
       })
 
       console.log(this. threadMessages);
+    },
+    invervalRecievingThreadData: function () {
+      setInterval(() => {
+        axios.get('chat/get_thread?thread_id=' +  JSON.parse(getCookie('currentThread'))).then( response => {
+          this.threadMessages = response.data
+          this.currentThread = JSON.parse(getCookie('currentThread'));
+        })
+        axios.get('chat/get_threads').then( response => {
+          this.threadsData = response.data
+        })
+      }, 1000)
+    },
+    openCreateThemeModal()
+    {
+      this.createNewTheme = true;
+    },
+    closeCreateThemeModal()
+    {
+      this.createNewTheme = false;
+    },
+    createNewThemeFunc: function (event) {
+      axios.post('chat/create_thread/',  {
+        'name' : new FormData(event.target).get('name')
+      }).then( response => {
+        // this.threadsData = response.data
+        this.newThread = response.data.new_thread_id
+        console.log(this.newThread)
+        axios.post('chat/invite_to_thread/',  {
+          'thread_id' : this.newThread,
+          'participants_id' : new FormData(event.target).get('participants_id')
+        }).then( response => {
+          // this.threadsData = response.data
+        })
+        this.newThread = null
+        this.createNewTheme = false;
+      })
+
     }
   }
 }

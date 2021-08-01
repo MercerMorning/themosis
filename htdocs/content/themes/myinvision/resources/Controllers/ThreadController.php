@@ -26,6 +26,8 @@ class ThreadController extends Controller
         $threadParameters = ['subject' => $request->get('name')];
         if ($request->has('participant_id')) {
             $threadParameters['private'] = 1;
+        } else {
+            $threadParameters['private'] = 0;
         }
 
         $thread = Thread::create($threadParameters);
@@ -40,7 +42,16 @@ class ThreadController extends Controller
             ]);
         }
 
+//        if ($request->has('participants_id')) {
+//            foreach ($request->get('p'))
+//            ThreadParticipant::create(['thread_id' => $thread->id,
+//                'user_id' => $request->get('participant_id')
+//            ]);
+//        }
+
+
         $threads = ThreadsListService::getWholeList()['threads'];
+        $threads['new_thread_id'] = $thread->id;
         if ($isSuccess) {
             return response($threads);
         }
@@ -49,6 +60,7 @@ class ThreadController extends Controller
 
     public function inviteParticipant(Request $request)
     {
+        return $request->all();
         $validator = Validator::make($request->all(), [
             'thread_id' => 'required|exists:threads,id',
             'participants' => 'required|exists:users,ID',
@@ -84,5 +96,11 @@ class ThreadController extends Controller
             return response($threadMessages);
         }
          return response('', 400);
+    }
+
+    function getAll()
+    {
+        $threads = ThreadsListService::getWholeList()['threads'];
+        return response($threads);
     }
 }
