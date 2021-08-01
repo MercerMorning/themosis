@@ -2171,32 +2171,38 @@ function setCookie(name, value) {
       return fetch('/');
     },
     sendMessage: function sendMessage(event) {
-      var _this = this;
+      var _FormData$get,
+          _this = this;
 
-      // let file = event.target.querySelector('[name="file"]').files[0];
-      // // console.log(event.target.querySelector('[name="file"]').value);
-      // // if (formFile.size === 0) {
-      // //   event.preventDefault();
-      // // }
-      // var reader = new FileReader();
-      // reader.readAsDataURL(file);
-      // reader.onload = function () {
-      //   axios.post('/chat/send_message_to_thread/',  {
-      //     'body' : new FormData(event.target).get('body'),
-      //     'thread_id' : new FormData(event.target).get('threadId'),
-      //     'file' : new FormData(event.target).get('file')
-      //     // 'file' : 'sdf'
-      //   }).then(response => {
-      //     this.threadMessages = response.data
-      //   })
-      axios.post('/chat/send_message_to_thread/', {
-        'body': new FormData(event.target).get('body'),
-        'thread_id': new FormData(event.target).get('threadId'),
-        'file': new FormData(event.target).get('file') // 'file' : 'sdf'
+      var formFile = (_FormData$get = new FormData(event.target).get('file')) !== null && _FormData$get !== void 0 ? _FormData$get : new FormData(event.target).get('file'); // console.log(event.target.querySelector('[name="file"]').value);
+      // if (formFile.size === 0) {
+      //   event.preventDefault();
+      // }
 
-      }).then(function (response) {
-        _this.threadMessages = response.data;
-      });
+      console.log(formFile.size);
+
+      if (formFile.size !== 0) {
+        var reader = new FileReader();
+        reader.readAsDataURL(formFile);
+
+        reader.onload = function () {
+          axios.post('/chat/send_message_to_thread/', {
+            'body': reader.result,
+            'thread_id': new FormData(event.target).get('threadId') // 'file' : 'sdf'
+
+          }).then(function (response) {
+            console.log(response.data); // this.threadMessages = response.data
+          });
+        };
+      } else {
+        axios.post('/chat/send_message_to_thread/', {
+          'body': new FormData(event.target).get('body'),
+          'thread_id': new FormData(event.target).get('threadId') // 'file' : 'sdf'
+
+        }).then(function (response) {
+          _this.threadMessages = response.data;
+        });
+      }
     },
     addThread: function addThread(event) {
       var _this2 = this;
@@ -20570,9 +20576,9 @@ var render = function() {
                       },
                       [
                         _vm._v(
-                          "\n                      " +
+                          "\n                    " +
                             _vm._s(user.first_name + " " + user.last_name) +
-                            "\n                  "
+                            "\n                "
                         )
                       ]
                     )
@@ -20603,13 +20609,13 @@ var render = function() {
           _vm._v(" "),
           _c("div", { staticClass: "thread-link__current-user_name" }, [
             _vm._v(
-              "\n            " +
+              "\n          " +
                 _vm._s(
                   _vm.usersData[_vm.usersData.current_user_id].first_name +
                     " " +
                     _vm.usersData[_vm.usersData.current_user_id].last_name
                 ) +
-                "\n          "
+                "\n        "
             )
           ])
         ])
@@ -20626,7 +20632,7 @@ var render = function() {
                 staticClass: "menu-threads__link",
                 on: { click: _vm.openCreateThemeModal }
               },
-              [_vm._v("\n            Создать новую тему\n          ")]
+              [_vm._v("\n          Создать новую тему\n        ")]
             )
           ]),
           _vm._v(" "),
@@ -20665,7 +20671,7 @@ var render = function() {
                       _c("div", { staticClass: "thread-link__content" }, [
                         _c("span", { staticClass: "thread-participant_name" }, [
                           _vm._v(
-                            "\n                  " +
+                            "\n                " +
                               _vm._s(
                                 thread.participant_id
                                   ? _vm.usersData[thread.participant_id]
@@ -20675,7 +20681,7 @@ var render = function() {
                                         .last_name
                                   : thread.subject
                               ) +
-                              "\n                "
+                              "\n              "
                           )
                         ]),
                         _vm._v(" "),
@@ -20728,9 +20734,7 @@ var render = function() {
               _c("div", { staticClass: "chat-message__date" }, [
                 _c("span", [
                   _vm._v(
-                    "\n                    " +
-                      _vm._s(date) +
-                      "\n                "
+                    "\n                  " + _vm._s(date) + "\n              "
                   )
                 ])
               ]),
@@ -20749,13 +20753,13 @@ var render = function() {
                     message.user_id !== _vm.usersData.current_user_id
                       ? _c("span", { staticClass: "chat-message__autor" }, [
                           _vm._v(
-                            "\n              " +
+                            "\n            " +
                               _vm._s(
                                 _vm.usersData[message.user_id].first_name +
                                   " " +
                                   _vm.usersData[message.user_id].last_name
                               ) +
-                              "\n            "
+                              "\n          "
                           )
                         ])
                       : _vm._e(),
@@ -20786,11 +20790,13 @@ var render = function() {
                                   "div",
                                   { staticClass: "chat-message__text" },
                                   [
-                                    _vm._v(
-                                      "\n                    " +
-                                        _vm._s(message.body) +
-                                        "\n                  "
-                                    )
+                                    message.body.length > 100
+                                      ? _c("img", {
+                                          attrs: { src: message.body }
+                                        })
+                                      : _c("span", [
+                                          _vm._v(_vm._s(message.body))
+                                        ])
                                   ]
                                 ),
                                 _vm._v(" "),
@@ -20903,7 +20909,7 @@ var staticRenderFns = [
       [
         _c("span", { staticClass: "send-button_text" }, [
           _vm._v(
-            "\n                                Отправить\n                            "
+            "\n                              Отправить\n                          "
           )
         ])
       ]

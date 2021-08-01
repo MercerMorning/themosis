@@ -22,7 +22,7 @@ class MessageController extends Controller
         $validator = Validator::make($request->all(), [
             'thread_id' => 'required|exists:threads,id',
 //            'file' => 'string|nullable',
-            'body' => 'required_without:file|string',
+            'body' => 'required|string',
         ]);
 
 //        if ($request->has('file')) {

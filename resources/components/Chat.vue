@@ -109,7 +109,8 @@
               <div class="chat-message__user-messages">
                 <div class="chat-message__message_message-body">
                   <div class="chat-message__text">
-                    {{ message.body }}
+                    <img v-if="message.body.length > 100" v-bind:src="message.body">
+                    <span v-else>{{ message.body }}</span>
                   </div>
                   <div class="chat-message__time">{{ message.created_at }}</div>
                 </div>
@@ -122,7 +123,6 @@
       <form enctype="multipart/form-data" class="chat-footer" v-on:submit.prevent="sendMessage">
         <div class="chat-footer__input-wrpa">
           <input type="hidden" name="threadId" v-bind:value="currentThread">
-<!--          <input type="file" name="file">-->
           <label class="chat-footer__input-file">
             <svg width="20" height="18">
               <use xlink:href="/content/themes/myinvision/assets/images/sprite.svg#icon-clip"></use>
@@ -210,31 +210,35 @@ export default {
       return fetch('/')
     },
     sendMessage: function (event) {
-      // let file = event.target.querySelector('[name="file"]').files[0];
-      // // console.log(event.target.querySelector('[name="file"]').value);
-      // // if (formFile.size === 0) {
-      // //   event.preventDefault();
-      // // }
-      // var reader = new FileReader();
-      // reader.readAsDataURL(file);
-      // reader.onload = function () {
-      //   axios.post('/chat/send_message_to_thread/',  {
-      //     'body' : new FormData(event.target).get('body'),
-      //     'thread_id' : new FormData(event.target).get('threadId'),
-      //     'file' : new FormData(event.target).get('file')
-      //     // 'file' : 'sdf'
-      //   }).then(response => {
-      //     this.threadMessages = response.data
-      //   })
-
+      let formFile = new FormData(event.target).get('file') ?? new FormData(event.target).get('file');
+      // console.log(event.target.querySelector('[name="file"]').value);
+      // if (formFile.size === 0) {
+      //   event.preventDefault();
+      // }
+      console.log(formFile.size)
+      if (formFile.size !== 0) {
+        var reader = new FileReader();
+        reader.readAsDataURL(formFile);
+        reader.onload = function () {
+          axios.post('/chat/send_message_to_thread/', {
+            'body': reader.result,
+            'thread_id': new FormData(event.target).get('threadId'),
+            // 'file' : 'sdf'
+          }).then(response => {
+            console.log(response.data)
+            // this.threadMessages = response.data
+          })
+        }
+      } else {
         axios.post('/chat/send_message_to_thread/',  {
           'body' : new FormData(event.target).get('body'),
           'thread_id' : new FormData(event.target).get('threadId'),
-          'file' : new FormData(event.target).get('file')
           // 'file' : 'sdf'
         }).then(response => {
           this.threadMessages = response.data
         })
+      }
+
 
     },
     addThread: function (event) {
@@ -309,7 +313,7 @@ export default {
         this.createNewTheme = false;
       })
 
-    }
+    },
   }
 }
 
