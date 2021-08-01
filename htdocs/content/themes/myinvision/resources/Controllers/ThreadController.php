@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use phpDocumentor\Reflection\Types\True_;
 use Theme\Models\Thread;
 use Theme\Models\ThreadParticipant;
 use Theme\Models\User;
@@ -60,19 +61,22 @@ class ThreadController extends Controller
 
     public function inviteParticipant(Request $request)
     {
-        return $request->all();
+//        return $request->all();
         $validator = Validator::make($request->all(), [
             'thread_id' => 'required|exists:threads,id',
-            'participants' => 'required|exists:users,ID',
+            'participants_id' => 'required|exists:users,ID',
         ]);
 
         if ($validator->fails()) {
             return response('', 400);
         }
 
-        return ThreadParticipant::create(['thread_id' => $request->get('thread_id'),
-            'user_id' => $request->get('participants')
-        ]);
+        foreach ($request->get('participants_id') as $participant) {
+            ThreadParticipant::create(['thread_id' => $request->get('thread_id'),
+                'user_id' => $participant
+            ]);
+        }
+
     }
 
     public function getThreadMessages(Request $request)

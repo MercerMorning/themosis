@@ -1,6 +1,9 @@
 <template>
   <div class="chat-container">
-    <div v-if="createNewTheme"  class="popups active">
+    <div
+         v-bind:class="[createNewTheme
+               ? 'popups active'
+               : 'popups']">
         <div class="popups__container-wrap">
           <button class="popups__close" v-on:click="closeCreateThemeModal">
             <svg width="20" height="20">
@@ -16,8 +19,10 @@
               </label>
               <label class="input">
                 <span class="input__placeholder" required>Участники</span>
-                <select name="participants_id" multiple>
-                  <option v-for="user in usersData" v-bind:value="user.ID">
+                <select class="theme_participants_input" name="participants_id" multiple>
+                  <option v-for="user in usersData"
+                          v-bind:value="user.ID"
+                          v-bind:selectvalue="user.ID">
                       {{ user.first_name + ' ' + user.last_name }}
                   </option>
                 </select>
@@ -273,6 +278,7 @@ export default {
     openCreateThemeModal()
     {
       this.createNewTheme = true;
+      jQuery('.theme_participants_input').select2();
     },
     closeCreateThemeModal()
     {
@@ -284,12 +290,20 @@ export default {
       }).then( response => {
         // this.threadsData = response.data
         this.newThread = response.data.new_thread_id
-        console.log(this.newThread)
+        let participantIds;
+        participantIds = jQuery('.theme_participants_input').find(':selected').map((itemId, element) => {
+            return element.value
+        })
+        // participantIds = jQuery('.theme_participants_input').find(':selected')
+        // participantIds = jQuery('.theme_participants_input').find(':selected').data('');
+        participantIds = participantIds.toArray()
         axios.post('chat/invite_to_thread/',  {
           'thread_id' : this.newThread,
-          'participants_id' : new FormData(event.target).get('participants_id')
+          'participants_id' : participantIds
         }).then( response => {
-          // this.threadsData = response.data
+          // console.log(new FormData(event.target).get('participants_id'))
+          console.log(response.data)
+          this.threadsData = response.data
         })
         this.newThread = null
         this.createNewTheme = false;
