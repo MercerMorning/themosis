@@ -3,7 +3,8 @@
     <div class="menu-threads">
       <div class="menu-threads__current-user">
         <a class="menu-threads__link current-user">
-          <img class="thread-link__participant_ava" src="/content/themes/myinvision/assets/images/person.png">
+          <img class="thread-link__participant_ava"
+               v-bind:src="usersData[usersData.current_user_id].ava">
           <div class="thread-link__current-user_name">
             {{ usersData[usersData.current_user_id].first_name + ' ' +  usersData[usersData.current_user_id].last_name}}
           </div>
@@ -15,46 +16,28 @@
                ? 'menu-threads__item active'
                : 'menu-threads__item']">
 
-          <a v-bind:data-id="thread.id" class="menu-threads__link" v-on:click="openThread">
+          <a v-bind:data-id="thread.id"
+             v-bind:data-participantId="thread.participant_id"
+             class="menu-threads__link"
+             v-on:click="openThread">
+            <img v-if="thread.participant_id"
+                 class="thread-link__participant_ava"
+                 v-bind:src="usersData[thread.participant_id].ava">
             <div class="thread-link__dialog">
               <div class="thread-link__content">
-                <span class="thread-participant_name">{{ thread.subject }}</span>
+                <span class="thread-participant_name">
+                  {{ thread.participant_id
+                    ? users[thread.participant_id].first_name + ' ' + users[thread.participant_id].last_name
+                    : thread.subject }}
+                </span>
                 <span class="thread-participant_message">{{ thread.last_message }}</span>
               </div>
               <div class="thread-link__date-time">
-                <span>{{ thread.created_at }}</span>
+                <span>{{ thread.datetime }}</span>
               </div>
             </div>
           </a>
         </li>
-<!--        <li class="menu-threads__item active">-->
-<!--          <a class="menu-threads__link">-->
-<!--            <img class="thread-link__participant_ava" src="/content/themes/myinvision/assets/images/person.png">-->
-<!--            <div class="thread-link__dialog">-->
-<!--              <div class="thread-link__content">-->
-<!--                <span class="thread-participant_name">Phillip Torff</span>-->
-<!--                <span class="thread-participant_message">Thank you, Phillip!</span>-->
-<!--              </div>-->
-<!--              <div class="thread-link__date-time">-->
-<!--                <span>17/06/2020</span>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </a>-->
-<!--        </li>-->
-<!--        <li class="menu-threads__item">-->
-<!--          <a class="menu-threads__link">-->
-<!--            <img class="thread-link__participant_ava" src="/content/themes/myinvision/assets/images/person.png">-->
-<!--            <div class="thread-link__dialog">-->
-<!--              <div class="thread-link__content">-->
-<!--                <span class="thread-participant_name">Phillip Torff</span>-->
-<!--                <span class="thread-participant_message">Thank you, Phillip!</span>-->
-<!--              </div>-->
-<!--              <div class="thread-link__date-time">-->
-<!--                <span>17/06/2020</span>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </a>-->
-<!--        </li>-->
       </ul>
     </div>
     <div class="chat mobile-hidden">
@@ -63,7 +46,8 @@
           <use xlink:href="/content/themes/myinvision/assets/images/previous.svg#previous"></use>
         </svg>
         <span>Phillip Torff</span>
-        <img class="" src="/content/themes/myinvision/assets/images/person.png">
+        <img class=""
+             v-bind:src="usersData[usersData.current_user_id].ava">
       </div>
       <div class="chat-body">
 
@@ -82,7 +66,8 @@
               {{ usersData[message.user_id].first_name + ' ' + usersData[message.user_id].last_name }}
             </span>
             <div class="chat-message__message_message-content">
-              <img v-if="message.user_id !== usersData.current_user_id" class="thread-link__participant_ava" src="/content/themes/myinvision/assets/images/person.png">
+              <img v-if="message.user_id !== usersData.current_user_id" class="thread-link__participant_ava"
+                   v-bind:src="usersData[message.user_id].ava">
               <div class="chat-message__user-messages">
                 <div class="chat-message__message_message-body">
                   <div class="chat-message__text">
@@ -96,9 +81,10 @@
           </div>
         </label>
       </div>
-      <form class="chat-footer" v-on:submit.prevent="sendMessage">
+      <form enctype="multipart/form-data" class="chat-footer" v-on:submit.prevent="sendMessage">
         <div class="chat-footer__input-wrpa">
           <input type="hidden" name="threadId" v-bind:value="currentThread">
+<!--          <input type="file" name="file">-->
           <label class="chat-footer__input-file">
             <svg width="20" height="18">
               <use xlink:href="/content/themes/myinvision/assets/images/sprite.svg#icon-clip"></use>
@@ -187,14 +173,33 @@ export default {
     getThreads: function () {
       return fetch('/')
     },
-    sendMessage: function () {
-      event.preventDefault();
-      axios.post('chat/send_message_to_thread/',  {
-        'body' : new FormData(event.target).get('body'),
-        'thread_id' : new FormData(event.target).get('threadId')
-      }).then(response => {
-        this.threadMessages = response.data
-      })
+    sendMessage: function (event) {
+      // let file = event.target.querySelector('[name="file"]').files[0];
+      // // console.log(event.target.querySelector('[name="file"]').value);
+      // // if (formFile.size === 0) {
+      // //   event.preventDefault();
+      // // }
+      // var reader = new FileReader();
+      // reader.readAsDataURL(file);
+      // reader.onload = function () {
+      //   axios.post('chat/send_message_to_thread/',  {
+      //     'body' : new FormData(event.target).get('body'),
+      //     'thread_id' : new FormData(event.target).get('threadId'),
+      //     'file' : new FormData(event.target).get('file')
+      //     // 'file' : 'sdf'
+      //   }).then(response => {
+      //     this.threadMessages = response.data
+      //   })
+
+        axios.post('chat/send_message_to_thread/',  {
+          'body' : new FormData(event.target).get('body'),
+          'thread_id' : new FormData(event.target).get('threadId'),
+          'file' : new FormData(event.target).get('file')
+          // 'file' : 'sdf'
+        }).then(response => {
+          this.threadMessages = response.data
+        })
+
     },
     addThread: function (event) {
       event.preventDefault();
@@ -205,7 +210,14 @@ export default {
       })
     },
     openThread: function (event) {
-      console.log(event.target.dataset.id)
+      if (!event.target.dataset.id) {
+        console.log(event.target.dataset.participantid)
+        axios.post('chat/create_thread/',  {
+          'participant_id' : event.target.dataset.participantid
+        }).then( response => {
+          this.threadsData = response.data
+        })
+      }
       axios.get('chat/get_thread?thread_id=' +  event.target.dataset.id).then( response => {
         this.threadMessages = response.data
         this.currentThread = event.target.dataset.id;

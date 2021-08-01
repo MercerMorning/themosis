@@ -8,27 +8,41 @@ use Illuminate\Support\Facades\Validator;
 use Theme\Models\Thread;
 use Theme\Models\ThreadParticipant;
 use Theme\Models\User;
+use Theme\Services\ThreadsListService;
 
 class ThreadController extends Controller
 {
     public function add(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string',
+//            'name' => 'required_without:participant_id|string',
+//            'participant_id' => 'required_without:name|string',
         ]);
 
         if ($validator->fails()) {
-            return response('', 400);
+            return response($validator->errors(), 400);
+        }
+//        return 123;
+        $threadParameters = ['subject' => $request->get('name')];
+        if ($request->has('participant_id')) {
+            $threadParameters['private'] = 1;
         }
 
-        $thread = Thread::create(['subject' => $request->get('name')]);
-        $userThreads = User::find(wp_get_current_user()->ID)->threads();
+        $thread = Thread::create($threadParameters);
 
         $isSuccess = ThreadParticipant::create(['thread_id' => $thread->id,
             'user_id' => wp_get_current_user()->ID
         ]);
+
+        if ($request->has('participant_id')) {
+            ThreadParticipant::create(['thread_id' => $thread->id,
+                'user_id' => $request->get('participant_id')
+            ]);
+        }
+
+        $threads = ThreadsListService::getWholeList()['threads'];
         if ($isSuccess) {
-            return response($userThreads);
+            return response($threads);
         }
         return response('', 400);
     }

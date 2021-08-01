@@ -2076,20 +2076,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 function getCookie(name) {
   var matches = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"));
   return matches ? decodeURIComponent(matches[1]) : JSON.stringify(null);
@@ -2148,13 +2134,30 @@ function setCookie(name, value) {
     getThreads: function getThreads() {
       return fetch('/');
     },
-    sendMessage: function sendMessage() {
+    sendMessage: function sendMessage(event) {
       var _this = this;
 
-      event.preventDefault();
+      // let file = event.target.querySelector('[name="file"]').files[0];
+      // // console.log(event.target.querySelector('[name="file"]').value);
+      // // if (formFile.size === 0) {
+      // //   event.preventDefault();
+      // // }
+      // var reader = new FileReader();
+      // reader.readAsDataURL(file);
+      // reader.onload = function () {
+      //   axios.post('chat/send_message_to_thread/',  {
+      //     'body' : new FormData(event.target).get('body'),
+      //     'thread_id' : new FormData(event.target).get('threadId'),
+      //     'file' : new FormData(event.target).get('file')
+      //     // 'file' : 'sdf'
+      //   }).then(response => {
+      //     this.threadMessages = response.data
+      //   })
       axios.post('chat/send_message_to_thread/', {
         'body': new FormData(event.target).get('body'),
-        'thread_id': new FormData(event.target).get('threadId')
+        'thread_id': new FormData(event.target).get('threadId'),
+        'file': new FormData(event.target).get('file') // 'file' : 'sdf'
+
       }).then(function (response) {
         _this.threadMessages = response.data;
       });
@@ -2172,7 +2175,15 @@ function setCookie(name, value) {
     openThread: function openThread(event) {
       var _this3 = this;
 
-      console.log(event.target.dataset.id);
+      if (!event.target.dataset.id) {
+        console.log(event.target.dataset.participantid);
+        axios.post('chat/create_thread/', {
+          'participant_id': event.target.dataset.participantid
+        }).then(function (response) {
+          _this3.threadsData = response.data;
+        });
+      }
+
       axios.get('chat/get_thread?thread_id=' + event.target.dataset.id).then(function (response) {
         _this3.threadMessages = response.data;
         _this3.currentThread = event.target.dataset.id;
@@ -2675,9 +2686,7 @@ var render = function() {
         _c("a", { staticClass: "menu-threads__link current-user" }, [
           _c("img", {
             staticClass: "thread-link__participant_ava",
-            attrs: {
-              src: "/content/themes/myinvision/assets/images/person.png"
-            }
+            attrs: { src: _vm.usersData[_vm.usersData.current_user_id].ava }
           }),
           _vm._v(" "),
           _c("div", { staticClass: "thread-link__current-user_name" }, [
@@ -2712,14 +2721,34 @@ var render = function() {
                 "a",
                 {
                   staticClass: "menu-threads__link",
-                  attrs: { "data-id": thread.id },
+                  attrs: {
+                    "data-id": thread.id,
+                    "data-participantId": thread.participant_id
+                  },
                   on: { click: _vm.openThread }
                 },
                 [
+                  thread.participant_id
+                    ? _c("img", {
+                        staticClass: "thread-link__participant_ava",
+                        attrs: { src: _vm.usersData[thread.participant_id].ava }
+                      })
+                    : _vm._e(),
+                  _vm._v(" "),
                   _c("div", { staticClass: "thread-link__dialog" }, [
                     _c("div", { staticClass: "thread-link__content" }, [
                       _c("span", { staticClass: "thread-participant_name" }, [
-                        _vm._v(_vm._s(thread.subject))
+                        _vm._v(
+                          "\n                  " +
+                            _vm._s(
+                              thread.participant_id
+                                ? _vm.users[thread.participant_id].first_name +
+                                    " " +
+                                    _vm.users[thread.participant_id].last_name
+                                : thread.subject
+                            ) +
+                            "\n                "
+                        )
                       ]),
                       _vm._v(" "),
                       _c(
@@ -2730,7 +2759,7 @@ var render = function() {
                     ]),
                     _vm._v(" "),
                     _c("div", { staticClass: "thread-link__date-time" }, [
-                      _c("span", [_vm._v(_vm._s(thread.created_at))])
+                      _c("span", [_vm._v(_vm._s(thread.datetime))])
                     ])
                   ])
                 ]
@@ -2756,7 +2785,7 @@ var render = function() {
         _c("span", [_vm._v("Phillip Torff")]),
         _vm._v(" "),
         _c("img", {
-          attrs: { src: "/content/themes/myinvision/assets/images/person.png" }
+          attrs: { src: _vm.usersData[_vm.usersData.current_user_id].ava }
         })
       ]),
       _vm._v(" "),
@@ -2809,10 +2838,7 @@ var render = function() {
                         message.user_id !== _vm.usersData.current_user_id
                           ? _c("img", {
                               staticClass: "thread-link__participant_ava",
-                              attrs: {
-                                src:
-                                  "/content/themes/myinvision/assets/images/person.png"
-                              }
+                              attrs: { src: _vm.usersData[message.user_id].ava }
                             })
                           : _vm._e(),
                         _vm._v(" "),
@@ -2864,6 +2890,7 @@ var render = function() {
         "form",
         {
           staticClass: "chat-footer",
+          attrs: { enctype: "multipart/form-data" },
           on: {
             submit: function($event) {
               $event.preventDefault()
