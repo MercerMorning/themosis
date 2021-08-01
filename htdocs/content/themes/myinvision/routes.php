@@ -27,3 +27,7 @@ Route::post('chat/send_message_to_thread/',
 Route::post('chat/invite_to_thread/',
     [\Theme\Controllers\ThreadController::class,
         'inviteParticipant'])->name('invite_participant');
+
+Route::any('page',
+    [\Theme\Controllers\PageController::class,
+        'index']);

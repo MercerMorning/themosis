@@ -2181,7 +2181,7 @@ function setCookie(name, value) {
       // var reader = new FileReader();
       // reader.readAsDataURL(file);
       // reader.onload = function () {
-      //   axios.post('chat/send_message_to_thread/',  {
+      //   axios.post('/chat/send_message_to_thread/',  {
       //     'body' : new FormData(event.target).get('body'),
       //     'thread_id' : new FormData(event.target).get('threadId'),
       //     'file' : new FormData(event.target).get('file')
@@ -2189,7 +2189,7 @@ function setCookie(name, value) {
       //   }).then(response => {
       //     this.threadMessages = response.data
       //   })
-      axios.post('chat/send_message_to_thread/', {
+      axios.post('/chat/send_message_to_thread/', {
         'body': new FormData(event.target).get('body'),
         'thread_id': new FormData(event.target).get('threadId'),
         'file': new FormData(event.target).get('file') // 'file' : 'sdf'
@@ -2202,7 +2202,7 @@ function setCookie(name, value) {
       var _this2 = this;
 
       event.preventDefault();
-      axios.post('chat/create_thread/', {
+      axios.post('/chat/create_thread/', {
         'name': new FormData(event.target).get('name')
       }).then(function (response) {
         _this2.threadsData = response.data;
@@ -2213,7 +2213,7 @@ function setCookie(name, value) {
 
       if (!event.target.dataset.id) {
         console.log(event.target.dataset.participantid);
-        axios.post('chat/create_thread/', {
+        axios.post('/chat/create_thread/', {
           'participant_id': event.target.dataset.participantid
         }).then(function (response) {
           _this3.threadsData = response.data;
@@ -2221,7 +2221,7 @@ function setCookie(name, value) {
       }
 
       var thread;
-      axios.get('chat/get_thread?thread_id=' + event.target.dataset.id).then(function (response) {
+      axios.get('/chat/get_thread?thread_id=' + event.target.dataset.id).then(function (response) {
         _this3.threadMessages = response.data;
         _this3.currentThread = event.target.dataset.id;
         setCookie('currentThread', JSON.stringify(event.target.dataset.id));
@@ -2233,11 +2233,11 @@ function setCookie(name, value) {
       var _this4 = this;
 
       setInterval(function () {
-        axios.get('chat/get_thread?thread_id=' + JSON.parse(getCookie('currentThread'))).then(function (response) {
+        axios.get('/chat/get_thread?thread_id=' + JSON.parse(getCookie('currentThread'))).then(function (response) {
           _this4.threadMessages = response.data;
           _this4.currentThread = JSON.parse(getCookie('currentThread'));
         });
-        axios.get('chat/get_threads').then(function (response) {
+        axios.get('/chat/get_threads').then(function (response) {
           _this4.threadsData = response.data;
         });
       }, 1000);
@@ -2252,7 +2252,7 @@ function setCookie(name, value) {
     createNewThemeFunc: function createNewThemeFunc(event) {
       var _this5 = this;
 
-      axios.post('chat/create_thread/', {
+      axios.post('/chat/create_thread/', {
         'name': new FormData(event.target).get('name')
       }).then(function (response) {
         // this.threadsData = response.data
@@ -2264,7 +2264,7 @@ function setCookie(name, value) {
         // participantIds = jQuery('.theme_participants_input').find(':selected').data('');
 
         participantIds = participantIds.toArray();
-        axios.post('chat/invite_to_thread/', {
+        axios.post('/chat/invite_to_thread/', {
           'thread_id': _this5.newThread,
           'participants_id': participantIds
         }).then(function (response) {

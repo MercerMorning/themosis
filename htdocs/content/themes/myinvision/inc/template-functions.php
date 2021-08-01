@@ -8,6 +8,11 @@ Action::add('wp_enqueue_scripts', function () {
    wp_enqueue_style('app_style', get_template_directory_uri() . '/assets/styles/style.css');
 });
 
+//add_filter('the_content', 'the_end');
+//function the_end( $text ){
+//
+//}
+
 ///**
 // * Adds custom classes to the array of body classes.
 // *

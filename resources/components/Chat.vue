@@ -218,7 +218,7 @@ export default {
       // var reader = new FileReader();
       // reader.readAsDataURL(file);
       // reader.onload = function () {
-      //   axios.post('chat/send_message_to_thread/',  {
+      //   axios.post('/chat/send_message_to_thread/',  {
       //     'body' : new FormData(event.target).get('body'),
       //     'thread_id' : new FormData(event.target).get('threadId'),
       //     'file' : new FormData(event.target).get('file')
@@ -227,7 +227,7 @@ export default {
       //     this.threadMessages = response.data
       //   })
 
-        axios.post('chat/send_message_to_thread/',  {
+        axios.post('/chat/send_message_to_thread/',  {
           'body' : new FormData(event.target).get('body'),
           'thread_id' : new FormData(event.target).get('threadId'),
           'file' : new FormData(event.target).get('file')
@@ -239,7 +239,7 @@ export default {
     },
     addThread: function (event) {
       event.preventDefault();
-      axios.post('chat/create_thread/',  {
+      axios.post('/chat/create_thread/',  {
         'name' : new FormData(event.target).get('name')
       }).then( response => {
         this.threadsData = response.data
@@ -248,14 +248,14 @@ export default {
     openThread: function (event) {
       if (!event.target.dataset.id) {
         console.log(event.target.dataset.participantid)
-        axios.post('chat/create_thread/',  {
+        axios.post('/chat/create_thread/',  {
           'participant_id' : event.target.dataset.participantid
         }).then( response => {
           this.threadsData = response.data
         })
       }
       let thread
-      axios.get('chat/get_thread?thread_id=' +  event.target.dataset.id).then( response => {
+      axios.get('/chat/get_thread?thread_id=' +  event.target.dataset.id).then( response => {
         this.threadMessages = response.data
         this.currentThread = event.target.dataset.id;
         setCookie('currentThread',  JSON.stringify(event.target.dataset.id))
@@ -266,11 +266,11 @@ export default {
     },
     invervalRecievingThreadData: function () {
       setInterval(() => {
-        axios.get('chat/get_thread?thread_id=' +  JSON.parse(getCookie('currentThread'))).then( response => {
+        axios.get('/chat/get_thread?thread_id=' +  JSON.parse(getCookie('currentThread'))).then( response => {
           this.threadMessages = response.data
           this.currentThread = JSON.parse(getCookie('currentThread'));
         })
-        axios.get('chat/get_threads').then( response => {
+        axios.get('/chat/get_threads').then( response => {
           this.threadsData = response.data
         })
       }, 1000)
@@ -285,7 +285,7 @@ export default {
       this.createNewTheme = false;
     },
     createNewThemeFunc: function (event) {
-      axios.post('chat/create_thread/',  {
+      axios.post('/chat/create_thread/',  {
         'name' : new FormData(event.target).get('name')
       }).then( response => {
         // this.threadsData = response.data
@@ -297,7 +297,7 @@ export default {
         // participantIds = jQuery('.theme_participants_input').find(':selected')
         // participantIds = jQuery('.theme_participants_input').find(':selected').data('');
         participantIds = participantIds.toArray()
-        axios.post('chat/invite_to_thread/',  {
+        axios.post('/chat/invite_to_thread/',  {
           'thread_id' : this.newThread,
           'participants_id' : participantIds
         }).then( response => {
