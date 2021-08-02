@@ -89,24 +89,27 @@
       </div>
       <div class="chat-body">
 
-        <label v-for="(messages, date) in threadMessages">
+        <label v-for="(authors, date) in threadMessages">
           <div class="chat-message__date">
                 <span>
                     {{ date }}
                 </span>
 
           </div>
-          <div v-for="message in messages"
-               v-bind:class="[message.user_id === usersData.current_user_id
+<!--          <div v-for="(messages, author) in authors">-->
+<!--              {{ messages[0]}}-->
+<!--          </div>-->
+          <div v-for="(messages, author) in authors"
+               v-bind:class="[messages[0].user_id === usersData.current_user_id
                ? 'chat-message__message chat-message__message_current-user'
                : 'chat-message__message chat-message__message_foreign-user']">
-            <span v-if="message.user_id !== usersData.current_user_id" class="chat-message__autor">
-              {{ usersData[message.user_id].first_name + ' ' + usersData[message.user_id].last_name }}
+            <span v-if="messages[0].user_id !== usersData.current_user_id" class="chat-message__autor">
+              {{ usersData[messages[0].user_id].first_name + ' ' + usersData[messages[0].user_id].last_name }}
             </span>
             <div class="chat-message__message_message-content">
               <img class="thread-link__participant_ava"
-                   v-bind:src="usersData[message.user_id].ava">
-              <div class="chat-message__user-messages">
+                   v-bind:src="usersData[messages[0].user_id].ava">
+              <div v-for="message in messages" class="chat-message__user-messages">
                 <div class="chat-message__message_message-body">
                   <div class="chat-message__text">
                     <img class="message_image" v-if="message.is_file" v-bind:src="message.body">

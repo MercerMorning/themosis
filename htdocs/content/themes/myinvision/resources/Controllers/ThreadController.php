@@ -91,7 +91,7 @@ class ThreadController extends Controller
 
         $threadMessages = ThreadsListService::formateMessages($request->get('thread_id'));
 
-
+//dd($threadMessages->toArray());
         if ($threadMessages) {
             return response($threadMessages);
         }

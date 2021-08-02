@@ -2114,6 +2114,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
 function getCookie(name) {
   var matches = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"));
   return matches ? decodeURIComponent(matches[1]) : JSON.stringify(null);
@@ -20607,9 +20610,9 @@ var render = function() {
                       },
                       [
                         _vm._v(
-                          "\n                    " +
+                          "\n                      " +
                             _vm._s(user.first_name + " " + user.last_name) +
-                            "\n                "
+                            "\n                  "
                         )
                       ]
                     )
@@ -20640,13 +20643,13 @@ var render = function() {
           _vm._v(" "),
           _c("div", { staticClass: "thread-link__current-user_name" }, [
             _vm._v(
-              "\n          " +
+              "\n            " +
                 _vm._s(
                   _vm.usersData[_vm.usersData.current_user_id].first_name +
                     " " +
                     _vm.usersData[_vm.usersData.current_user_id].last_name
                 ) +
-                "\n        "
+                "\n          "
             )
           ])
         ])
@@ -20663,7 +20666,7 @@ var render = function() {
                 staticClass: "menu-threads__link",
                 on: { click: _vm.openCreateThemeModal }
               },
-              [_vm._v("\n          Создать новую тему\n        ")]
+              [_vm._v("\n            Создать новую тему\n          ")]
             )
           ]),
           _vm._v(" "),
@@ -20702,13 +20705,13 @@ var render = function() {
                       _c("div", { staticClass: "thread-link__content" }, [
                         _c("span", { staticClass: "thread-participant_name" }, [
                           _vm._v(
-                            "\n                " +
+                            "\n                  " +
                               _vm._s(
                                 thread.participant_id
                                   ? thread.first_name + " " + thread.last_name
                                   : thread.subject
                               ) +
-                              "\n              "
+                              "\n                "
                           )
                         ]),
                         _vm._v(" "),
@@ -20754,39 +20757,41 @@ var render = function() {
       _c(
         "div",
         { staticClass: "chat-body" },
-        _vm._l(_vm.threadMessages, function(messages, date) {
+        _vm._l(_vm.threadMessages, function(authors, date) {
           return _c(
             "label",
             [
               _c("div", { staticClass: "chat-message__date" }, [
                 _c("span", [
                   _vm._v(
-                    "\n                  " + _vm._s(date) + "\n              "
+                    "\n                    " +
+                      _vm._s(date) +
+                      "\n                "
                   )
                 ])
               ]),
               _vm._v(" "),
-              _vm._l(messages, function(message) {
+              _vm._l(authors, function(messages, author) {
                 return _c(
                   "div",
                   {
                     class: [
-                      message.user_id === _vm.usersData.current_user_id
+                      messages[0].user_id === _vm.usersData.current_user_id
                         ? "chat-message__message chat-message__message_current-user"
                         : "chat-message__message chat-message__message_foreign-user"
                     ]
                   },
                   [
-                    message.user_id !== _vm.usersData.current_user_id
+                    messages[0].user_id !== _vm.usersData.current_user_id
                       ? _c("span", { staticClass: "chat-message__autor" }, [
                           _vm._v(
-                            "\n            " +
+                            "\n              " +
                               _vm._s(
-                                _vm.usersData[message.user_id].first_name +
+                                _vm.usersData[messages[0].user_id].first_name +
                                   " " +
-                                  _vm.usersData[message.user_id].last_name
+                                  _vm.usersData[messages[0].user_id].last_name
                               ) +
-                              "\n          "
+                              "\n            "
                           )
                         ])
                       : _vm._e(),
@@ -20797,45 +20802,48 @@ var render = function() {
                       [
                         _c("img", {
                           staticClass: "thread-link__participant_ava",
-                          attrs: { src: _vm.usersData[message.user_id].ava }
+                          attrs: { src: _vm.usersData[messages[0].user_id].ava }
                         }),
                         _vm._v(" "),
-                        _c(
-                          "div",
-                          { staticClass: "chat-message__user-messages" },
-                          [
-                            _c(
-                              "div",
-                              {
-                                staticClass:
-                                  "chat-message__message_message-body"
-                              },
-                              [
-                                _c(
-                                  "div",
-                                  { staticClass: "chat-message__text" },
-                                  [
-                                    message.is_file
-                                      ? _c("img", {
-                                          staticClass: "message_image",
-                                          attrs: { src: message.body }
-                                        })
-                                      : _c("span", [
-                                          _vm._v(_vm._s(message.body))
-                                        ])
-                                  ]
-                                ),
-                                _vm._v(" "),
-                                _c(
-                                  "div",
-                                  { staticClass: "chat-message__time" },
-                                  [_vm._v(_vm._s(message.created_at))]
-                                )
-                              ]
-                            )
-                          ]
-                        )
-                      ]
+                        _vm._l(messages, function(message) {
+                          return _c(
+                            "div",
+                            { staticClass: "chat-message__user-messages" },
+                            [
+                              _c(
+                                "div",
+                                {
+                                  staticClass:
+                                    "chat-message__message_message-body"
+                                },
+                                [
+                                  _c(
+                                    "div",
+                                    { staticClass: "chat-message__text" },
+                                    [
+                                      message.is_file
+                                        ? _c("img", {
+                                            staticClass: "message_image",
+                                            attrs: { src: message.body }
+                                          })
+                                        : _c("span", [
+                                            _vm._v(_vm._s(message.body))
+                                          ])
+                                    ]
+                                  ),
+                                  _vm._v(" "),
+                                  _c(
+                                    "div",
+                                    { staticClass: "chat-message__time" },
+                                    [_vm._v(_vm._s(message.created_at))]
+                                  )
+                                ]
+                              )
+                            ]
+                          )
+                        })
+                      ],
+                      2
                     )
                   ]
                 )
@@ -20939,7 +20947,7 @@ var staticRenderFns = [
       [
         _c("span", { staticClass: "send-button_text" }, [
           _vm._v(
-            "\n                              Отправить\n                          "
+            "\n                                Отправить\n                            "
           )
         ])
       ]

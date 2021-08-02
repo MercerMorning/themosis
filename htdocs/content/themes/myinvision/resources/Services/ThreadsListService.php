@@ -99,6 +99,7 @@ class ThreadsListService
                 ];
             });
         $users['current_user_id'] = wp_get_current_user()->ID;
+
         return ['threads' => $threads, 'users' => $users];
     }
 
@@ -108,11 +109,28 @@ class ThreadsListService
         $threadMessages = $threadMessages->map(function ($item) {
             if ($item->is_file) {
                 $item->body = file_get_contents($item->body);
-//                $item->body = 123;
             }
             $item->date = $item->created_at->format('d.m.Y');
             return $item;
-        })->groupBy('date');
+        })->groupBy('date')
+            ->map(function ($item) {
+            $messages = $item->toArray();
+            $formatedMessages = [];
+            $messagesGroupKey = 0;
+            $lastMessage = 0;
+            for ($i = 0; $i < count($messages); $i++) {
+                if ($i == 0) {
+                    $lastMessage = $formatedMessages[$messagesGroupKey][] = $messages[$i];
+                } else {
+                    if ($lastMessage['user_id'] !=  $messages[$i]['user_id']) {
+                        $messagesGroupKey++;
+                    }
+                    $lastMessage = $formatedMessages[$messagesGroupKey][] = $messages[$i];
+//                    $formatedMessages[$messagesGroupKey][] = $messages[$i];
+                }
+            }
+            return $formatedMessages;
+        });
         return $threadMessages;
     }
 }

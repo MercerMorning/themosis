@@ -2,12 +2,17 @@
 namespace Theme\Controllers;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use Theme\Services\ThreadsListService;
 
 class PageController extends Controller
 {
     public function index()
     {
+        $request = new Request(['thread_id' => 171]);
+        $threadC = new ThreadController();
+//        dd($threadC->getThreadMessages($request));
+
         global $post;
         $threadsAndUsers = ThreadsListService::getWholeList();
 //        dd($threadsAndUsers);
