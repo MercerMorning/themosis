@@ -2174,11 +2174,7 @@ function setCookie(name, value) {
       var _FormData$get,
           _this = this;
 
-      var formFile = (_FormData$get = new FormData(event.target).get('file')) !== null && _FormData$get !== void 0 ? _FormData$get : new FormData(event.target).get('file'); // console.log(event.target.querySelector('[name="file"]').value);
-      // if (formFile.size === 0) {
-      //   event.preventDefault();
-      // }
-
+      var formFile = (_FormData$get = new FormData(event.target).get('file')) !== null && _FormData$get !== void 0 ? _FormData$get : new FormData(event.target).get('file');
       console.log(formFile.size);
 
       if (formFile.size !== 0) {
@@ -2203,50 +2199,58 @@ function setCookie(name, value) {
           _this.threadMessages = response.data;
         });
       }
+
+      document.querySelector('.chat-footer').reset();
     },
-    addThread: function addThread(event) {
+    // addThread: function (event) {
+    //   event.preventDefault();
+    //   axios.post('/chat/create_thread/',  {
+    //     'name' : new FormData(event.target).get('name')
+    //   }).then( response => {
+    //     this.threadsData = response.data
+    //   })
+    // },
+    openThread: function openThread(event) {
       var _this2 = this;
 
-      event.preventDefault();
-      axios.post('/chat/create_thread/', {
-        'name': new FormData(event.target).get('name')
-      }).then(function (response) {
-        _this2.threadsData = response.data;
-      });
-    },
-    openThread: function openThread(event) {
-      var _this3 = this;
+      document.querySelector('.chat-footer').reset();
 
-      if (!event.target.dataset.id) {
-        console.log(event.target.dataset.participantid);
-        axios.post('/chat/create_thread/', {
-          'participant_id': event.target.dataset.participantid
-        }).then(function (response) {
-          _this3.threadsData = response.data;
+      if (event.target.classList == 'menu-threads__link') {
+        if (!event.target.dataset.id) {
+          console.log(event.target.dataset.participantid);
+          axios.post('/chat/create_thread/', {
+            'participant_id': event.target.dataset.participantid
+          }).then(function (response) {
+            _this2.threadsData = response.data;
+          });
+        }
+
+        var thread;
+        axios.get('/chat/get_thread?thread_id=' + event.target.dataset.id).then(function (response) {
+          _this2.threadMessages = response.data;
+          _this2.currentThread = event.target.dataset.id;
+          setCookie('currentThread', JSON.stringify(event.target.dataset.id));
+          setCookie('threadMessages', JSON.stringify(response.data));
         });
+        console.log(this.threadMessages);
       }
-
-      var thread;
-      axios.get('/chat/get_thread?thread_id=' + event.target.dataset.id).then(function (response) {
-        _this3.threadMessages = response.data;
-        _this3.currentThread = event.target.dataset.id;
-        setCookie('currentThread', JSON.stringify(event.target.dataset.id));
-        setCookie('threadMessages', JSON.stringify(response.data));
-      });
-      console.log(this.threadMessages);
     },
     invervalRecievingThreadData: function invervalRecievingThreadData() {
-      var _this4 = this;
+      var _this3 = this;
 
       setInterval(function () {
         axios.get('/chat/get_thread?thread_id=' + JSON.parse(getCookie('currentThread'))).then(function (response) {
-          _this4.threadMessages = response.data;
-          _this4.currentThread = JSON.parse(getCookie('currentThread'));
+          _this3.threadMessages = response.data;
+          _this3.currentThread = JSON.parse(getCookie('currentThread'));
+        })["catch"](function (error) {
+          console.log(error);
         });
         axios.get('/chat/get_threads').then(function (response) {
-          _this4.threadsData = response.data;
+          _this3.threadsData = response.data;
+        })["catch"](function (error) {
+          console.log(error);
         });
-      }, 1000);
+      }, 3000);
     },
     openCreateThemeModal: function openCreateThemeModal() {
       this.createNewTheme = true;
@@ -2256,13 +2260,13 @@ function setCookie(name, value) {
       this.createNewTheme = false;
     },
     createNewThemeFunc: function createNewThemeFunc(event) {
-      var _this5 = this;
+      var _this4 = this;
 
       axios.post('/chat/create_thread/', {
         'name': new FormData(event.target).get('name')
       }).then(function (response) {
         // this.threadsData = response.data
-        _this5.newThread = response.data.new_thread_id;
+        _this4.newThread = response.data.new_thread_id;
         var participantIds;
         participantIds = jQuery('.theme_participants_input').find(':selected').map(function (itemId, element) {
           return element.value;
@@ -2271,16 +2275,38 @@ function setCookie(name, value) {
 
         participantIds = participantIds.toArray();
         axios.post('/chat/invite_to_thread/', {
-          'thread_id': _this5.newThread,
+          'thread_id': _this4.newThread,
           'participants_id': participantIds
         }).then(function (response) {
           // console.log(new FormData(event.target).get('participants_id'))
           console.log(response.data);
-          _this5.threadsData = response.data;
+          _this4.threadsData = response.data;
         });
-        _this5.newThread = null;
-        _this5.createNewTheme = false;
+        _this4.newThread = null;
+        _this4.createNewTheme = false;
       });
+    },
+    sendImage: function sendImage() {
+      // console.log(document.querySelector('.chat-footer'));
+      var formData = new FormData(document.querySelector('.chat-footer'));
+
+      if (formData.get('file').size !== 0) {
+        var reader = new FileReader();
+        reader.readAsDataURL(formData.get('file'));
+
+        reader.onload = function () {
+          console.log(reader.result);
+          axios.post('/chat/send_message_to_thread/', {
+            'body': reader.result,
+            'thread_id': formData.get('threadId') // 'file' : 'sdf'
+
+          }).then(function (response) {// console.log(response.data)
+            // this.threadMessages = response.data
+          });
+        };
+      }
+
+      document.querySelector('.chat-footer').reset();
     }
   }
 });
@@ -20768,12 +20794,10 @@ var render = function() {
                       "div",
                       { staticClass: "chat-message__message_message-content" },
                       [
-                        message.user_id !== _vm.usersData.current_user_id
-                          ? _c("img", {
-                              staticClass: "thread-link__participant_ava",
-                              attrs: { src: _vm.usersData[message.user_id].ava }
-                            })
-                          : _vm._e(),
+                        _c("img", {
+                          staticClass: "thread-link__participant_ava",
+                          attrs: { src: _vm.usersData[message.user_id].ava }
+                        }),
                         _vm._v(" "),
                         _c(
                           "div",
@@ -20850,7 +20874,11 @@ var render = function() {
                 })
               ]),
               _vm._v(" "),
-              _c("input", { attrs: { type: "file", name: "file" } })
+              _c("input", {
+                staticClass: "input-file",
+                attrs: { type: "file", name: "file" },
+                on: { change: _vm.sendImage }
+              })
             ]),
             _vm._v(" "),
             _vm._m(1),
@@ -33104,14 +33132,15 @@ module.exports = g;
 /*!***************************************!*\
   !*** ./resources/components/Chat.vue ***!
   \***************************************/
-/*! exports provided: default */
+/*! no static exports found */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Chat_vue_vue_type_template_id_5e6f09c9___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Chat.vue?vue&type=template&id=5e6f09c9& */ "./resources/components/Chat.vue?vue&type=template&id=5e6f09c9&");
 /* harmony import */ var _Chat_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Chat.vue?vue&type=script&lang=js& */ "./resources/components/Chat.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _Chat_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__) if(["default"].indexOf(__WEBPACK_IMPORT_KEY__) < 0) (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _Chat_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
@@ -33141,7 +33170,7 @@ component.options.__file = "resources/components/Chat.vue"
 /*!****************************************************************!*\
   !*** ./resources/components/Chat.vue?vue&type=script&lang=js& ***!
   \****************************************************************/
-/*! exports provided: default */
+/*! no static exports found */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -33209,7 +33238,7 @@ var app = new Vue({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\OpenServer\domains\myinvision_t\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\OpenServer\domains\themosis\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })

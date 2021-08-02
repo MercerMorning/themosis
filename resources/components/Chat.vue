@@ -104,7 +104,7 @@
               {{ usersData[message.user_id].first_name + ' ' + usersData[message.user_id].last_name }}
             </span>
             <div class="chat-message__message_message-content">
-              <img v-if="message.user_id !== usersData.current_user_id" class="thread-link__participant_ava"
+              <img class="thread-link__participant_ava"
                    v-bind:src="usersData[message.user_id].ava">
               <div class="chat-message__user-messages">
                 <div class="chat-message__message_message-body">
@@ -127,7 +127,7 @@
             <svg width="20" height="18">
               <use xlink:href="/content/themes/myinvision/assets/images/sprite.svg#icon-clip"></use>
             </svg>
-            <input type="file" name="file">
+            <input type="file" class="input-file" name="file" v-on:change="sendImage">
           </label>
           <label class="chat-footer__input-text">
             <textarea class="input-message" type="text" name="body" placeholder="Введите сообщение"></textarea>
@@ -210,11 +210,9 @@ export default {
       return fetch('/')
     },
     sendMessage: function (event) {
+
       let formFile = new FormData(event.target).get('file') ?? new FormData(event.target).get('file');
-      // console.log(event.target.querySelector('[name="file"]').value);
-      // if (formFile.size === 0) {
-      //   event.preventDefault();
-      // }
+
       console.log(formFile.size)
       if (formFile.size !== 0) {
         var reader = new FileReader();
@@ -238,46 +236,55 @@ export default {
           this.threadMessages = response.data
         })
       }
-
+      document.querySelector('.chat-footer').reset()
 
     },
-    addThread: function (event) {
-      event.preventDefault();
-      axios.post('/chat/create_thread/',  {
-        'name' : new FormData(event.target).get('name')
-      }).then( response => {
-        this.threadsData = response.data
-      })
-    },
+    // addThread: function (event) {
+    //   event.preventDefault();
+    //   axios.post('/chat/create_thread/',  {
+    //     'name' : new FormData(event.target).get('name')
+    //   }).then( response => {
+    //     this.threadsData = response.data
+    //   })
+    // },
     openThread: function (event) {
-      if (!event.target.dataset.id) {
-        console.log(event.target.dataset.participantid)
-        axios.post('/chat/create_thread/',  {
-          'participant_id' : event.target.dataset.participantid
-        }).then( response => {
-          this.threadsData = response.data
+      document.querySelector('.chat-footer').reset()
+      if (event.target.classList == 'menu-threads__link') {
+        if (!event.target.dataset.id) {
+          console.log(event.target.dataset.participantid)
+          axios.post('/chat/create_thread/',  {
+            'participant_id' : event.target.dataset.participantid
+          }).then( response => {
+            this.threadsData = response.data
+          })
+        }
+        let thread
+        axios.get('/chat/get_thread?thread_id=' +  event.target.dataset.id).then( response => {
+          this.threadMessages = response.data
+          this.currentThread = event.target.dataset.id;
+          setCookie('currentThread',  JSON.stringify(event.target.dataset.id))
+          setCookie('threadMessages',  JSON.stringify(response.data))
         })
-      }
-      let thread
-      axios.get('/chat/get_thread?thread_id=' +  event.target.dataset.id).then( response => {
-        this.threadMessages = response.data
-        this.currentThread = event.target.dataset.id;
-        setCookie('currentThread',  JSON.stringify(event.target.dataset.id))
-        setCookie('threadMessages',  JSON.stringify(response.data))
-      })
 
-      console.log(this. threadMessages);
+        console.log(this. threadMessages);
+      }
+
     },
     invervalRecievingThreadData: function () {
-      setInterval(() => {
-        axios.get('/chat/get_thread?thread_id=' +  JSON.parse(getCookie('currentThread'))).then( response => {
-          this.threadMessages = response.data
-          this.currentThread = JSON.parse(getCookie('currentThread'));
-        })
-        axios.get('/chat/get_threads').then( response => {
-          this.threadsData = response.data
-        })
-      }, 1000)
+        setInterval(() => {
+          axios.get('/chat/get_thread?thread_id=' +  JSON.parse(getCookie('currentThread'))).then( response => {
+            this.threadMessages = response.data
+            this.currentThread = JSON.parse(getCookie('currentThread'));
+          }).catch(function (error) {
+            console.log(error)
+          })
+          axios.get('/chat/get_threads').then( response => {
+            this.threadsData = response.data
+          }).catch(function (error) {
+            console.log(error)
+          })
+        }, 3000)
+
     },
     openCreateThemeModal()
     {
@@ -314,6 +321,27 @@ export default {
       })
 
     },
+    sendImage: function()
+    {
+      // console.log(document.querySelector('.chat-footer'));
+      let formData = new FormData(document.querySelector('.chat-footer'));
+      if (formData.get('file').size !== 0) {
+        var reader = new FileReader();
+        reader.readAsDataURL(formData.get('file'));
+        reader.onload = function () {
+          console.log(reader.result);
+          axios.post('/chat/send_message_to_thread/', {
+            'body': reader.result,
+            'thread_id': formData.get('threadId'),
+            // 'file' : 'sdf'
+          }).then(response => {
+            // console.log(response.data)
+            // this.threadMessages = response.data
+          })
+        }
+      }
+      document.querySelector('.chat-footer').reset()
+    }
   }
 }
 

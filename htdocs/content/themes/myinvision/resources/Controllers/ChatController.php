@@ -14,6 +14,10 @@ class ChatController extends Controller
 {
     public function index()
     {
+//        $request = new Request(['thread_id' => 1]);
+//        $threadC = new ThreadController();
+//        $threadC->getThreadMessages($request);
+
         $threadsAndUsers = ThreadsListService::getWholeList();
 //        dd($threadsAndUsers);
         return view('front.chat', [

@@ -140,6 +140,10 @@ src: url("./fonts/exotwo/exo2medium.ttf") format("truetype");
 }
 
 .chat-message__message_current-user .chat-message__message_message-content {
+    flex-direction: row-reverse;
+}
+
+.chat-message__message_current-user .chat-message__message_message-content {
     float: right;
     margin-right: 30px;
 }
