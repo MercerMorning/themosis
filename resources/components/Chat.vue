@@ -65,7 +65,7 @@
               <div class="thread-link__content">
                 <span class="thread-participant_name">
                   {{ thread.participant_id
-                    ? usersData[thread.participant_id].first_name + ' ' + usersData[thread.participant_id].last_name
+                    ? thread.first_name + ' ' + thread.last_name
                     : thread.subject }}
                 </span>
                 <span class="thread-participant_message">{{ thread.last_message }}</span>
@@ -109,7 +109,7 @@
               <div class="chat-message__user-messages">
                 <div class="chat-message__message_message-body">
                   <div class="chat-message__text">
-                    <img v-if="message.body.length > 100" v-bind:src="message.body">
+                    <img class="message_image" v-if="message.is_file" v-bind:src="message.body">
                     <span v-else>{{ message.body }}</span>
                   </div>
                   <div class="chat-message__time">{{ message.created_at }}</div>
@@ -256,17 +256,23 @@ export default {
             'participant_id' : event.target.dataset.participantid
           }).then( response => {
             this.threadsData = response.data
+            let newThreadId = response.data.new_thread_id
+            axios.get('/chat/get_thread?thread_id=' +  newThreadId).then( response => {
+              this.threadMessages = response.data
+              this.currentThread = newThreadId;
+              setCookie('currentThread',  JSON.stringify(newThreadId))
+              setCookie('threadMessages',  JSON.stringify(response.data))
+            })
+          })
+
+        } else {
+          axios.get('/chat/get_thread?thread_id=' +  event.target.dataset.id).then( response => {
+            this.threadMessages = response.data
+            this.currentThread = event.target.dataset.id;
+            setCookie('currentThread',  JSON.stringify(event.target.dataset.id))
+            setCookie('threadMessages',  JSON.stringify(response.data))
           })
         }
-        let thread
-        axios.get('/chat/get_thread?thread_id=' +  event.target.dataset.id).then( response => {
-          this.threadMessages = response.data
-          this.currentThread = event.target.dataset.id;
-          setCookie('currentThread',  JSON.stringify(event.target.dataset.id))
-          setCookie('threadMessages',  JSON.stringify(response.data))
-        })
-
-        console.log(this. threadMessages);
       }
 
     },
@@ -331,7 +337,7 @@ export default {
         reader.onload = function () {
           console.log(reader.result);
           axios.post('/chat/send_message_to_thread/', {
-            'body': reader.result,
+            'image': reader.result,
             'thread_id': formData.get('threadId'),
             // 'file' : 'sdf'
           }).then(response => {

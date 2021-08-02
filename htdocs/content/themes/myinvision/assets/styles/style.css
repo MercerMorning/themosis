@@ -421,6 +421,10 @@ src: url("./fonts/exotwo/exo2medium.ttf") format("truetype");
     margin: 8px 0;
     color: #68717b; }
 
+.message_image {
+    max-width: 500px;
+}
+
 @media screen and (max-width: 768px) {
     .popups__container-wrap {
         padding: 0 16px;

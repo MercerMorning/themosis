@@ -8,7 +8,7 @@ class ThreadMessage extends Model
 {
     protected $table = 'messages';
 
-    protected $fillable = ['body', 'thread_id', 'user_id'];
+    protected $fillable = ['body', 'thread_id', 'user_id', 'is_file'];
 
     protected $casts = [
         'created_at' => 'datetime: H:i',
@@ -23,6 +23,7 @@ class ThreadMessage extends Model
         } else {
             $userName = User::find($this->user_id)->user_login;
         }
-        return $userName . ': ' . $this->body;
+        $body = $this->is_file ? ''  : $this->body;
+        return $userName . ': ' . $body;
     }
 }

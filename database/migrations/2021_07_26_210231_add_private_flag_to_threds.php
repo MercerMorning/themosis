@@ -9,7 +9,7 @@ class AddPrivateFlagToThreds extends Migration
     public function up()
     {
         Schema::table('threads', function (Blueprint $table) {
-            $table->boolean('private');
+            $table->boolean('private')->nullable();
         });
     }
 

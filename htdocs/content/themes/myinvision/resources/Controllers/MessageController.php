@@ -11,12 +11,26 @@ use Theme\Models\Thread;
 use Theme\Models\ThreadMessage;
 use Theme\Models\ThreadParticipant;
 use Theme\Models\User;
+use Theme\Services\ThreadsListService;
 
 
 class MessageController extends Controller
 {
     public function send(Request $request)
     {
+        if ($request->has('image')) {
+            $fileName = "file_" . Str::uuid();
+            file_put_contents(get_template_directory() . '/storage/' . $fileName, $request->get('image'));
+//            Storage::disk('theme')->put($fileName, $request->get('image'));
+            ThreadMessage::create([
+                'user_id' => wp_get_current_user()->ID,
+                'is_file' => 1,
+                'thread_id' => $request->get('thread_id'),
+                'body' => get_template_directory_uri() . '/storage/' . $fileName]);
+            $threadMessages = ThreadsListService::formateMessages($request->get('thread_id'));
+            return $threadMessages;
+        }
+
 //        return json_encode($request->all());
 
         $validator = Validator::make($request->all(), [
@@ -25,14 +39,7 @@ class MessageController extends Controller
             'body' => 'required|string',
         ]);
 
-//        if ($request->has('file')) {
-//            $image = $request->get('file');
-//            $data = str_replace('data:image/jpg;base64,', '', $image);
-//            $data = str_replace('data:image/png;base64,', '', $data);
-//            $data = str_replace(' ', '+', $data);
-//            $data = base64_decode($data);
-//            Storage::disk('local')->put("file_" . Str::uuid() . '.jpg', $data);
-//        }
+
 
         if ($validator->fails()) {
             return response($validator->errors(), 400);
@@ -43,11 +50,7 @@ class MessageController extends Controller
             'thread_id' => $request->get('thread_id'),
             'body' => $request->get('body')]);
 
-        $threadMessages = Thread::find($request->get('thread_id'))->messages();
-        $threadMessages = $threadMessages->map(function ($item) {
-            $item->date = $item->created_at->format('d.m.Y');
-            return $item;
-        })->groupBy('date');
+        $threadMessages = ThreadsListService::formateMessages($request->get('thread_id'));
 
         if ($message) {
             return $threadMessages;

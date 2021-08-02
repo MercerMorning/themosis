@@ -3,6 +3,7 @@ namespace Theme\Services;
 
 
 use Carbon\Carbon;
+use Theme\Models\Thread;
 use Theme\Models\ThreadMessage;
 use Theme\Models\ThreadParticipant;
 use Theme\Models\User;
@@ -32,9 +33,8 @@ class ThreadsListService
             $dialogParticipant = ThreadParticipant::query()
                 ->where('thread_id', $item->id)
                 ->where('user_id', '!=', wp_get_current_user()->ID)
-                ->first()
-                ->user_id;
-            $alreadyExistDialogs[] = $dialogParticipant;
+                ->first();
+            $alreadyExistDialogs[] = $dialogParticipant->user_id;
             $threadMessage = ThreadMessage::query()
                 ->where('thread_id', $item->id)
                 ->orderBy('created_at', 'desc')
@@ -42,8 +42,10 @@ class ThreadsListService
             return [
                 $item->id =>  [
                     'participant_id' =>
-                        $dialogParticipant
+                        $dialogParticipant->user_id
                     ,
+                    'first_name' => get_user_meta( $dialogParticipant->user_id, 'first_name', true ),
+                    'last_name' => get_user_meta( $dialogParticipant->user_id, 'last_name', true ),
                     'id' => $item->id,
                     'created_at' => $item->created_at,
                     'datetime' => Carbon::parse($item->created_at)->format('d.m.Y'),
@@ -90,9 +92,27 @@ class ThreadsListService
             ->whereNotIn('id', $alreadyExistDialogs)
             ->get()
             ->each(function ($user) use (&$threads){
-                $threads[] = ['participant_id' => $user->ID];
+                $threads[] = [
+                    'participant_id' => $user->ID,
+                   'first_name' => get_user_meta( $user->ID, 'first_name', true ),
+                    'last_name' => get_user_meta( $user->ID, 'last_name', true ),
+                ];
             });
         $users['current_user_id'] = wp_get_current_user()->ID;
         return ['threads' => $threads, 'users' => $users];
+    }
+
+    public static function formateMessages($thread_id)
+    {
+        $threadMessages = Thread::find($thread_id)->messages();
+        $threadMessages = $threadMessages->map(function ($item) {
+            if ($item->is_file) {
+                $item->body = file_get_contents($item->body);
+//                $item->body = 123;
+            }
+            $item->date = $item->created_at->format('d.m.Y');
+            return $item;
+        })->groupBy('date');
+        return $threadMessages;
     }
 }

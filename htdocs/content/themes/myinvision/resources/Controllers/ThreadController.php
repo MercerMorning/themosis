@@ -89,11 +89,7 @@ class ThreadController extends Controller
             return response('', 400);
         }
 
-        $threadMessages = Thread::find($request->get('thread_id'))->messages();
-        $threadMessages = $threadMessages->map(function ($item) {
-            $item->date = $item->created_at->format('d.m.Y');
-            return $item;
-        })->groupBy('date');
+        $threadMessages = ThreadsListService::formateMessages($request->get('thread_id'));
 
 
         if ($threadMessages) {

@@ -17,7 +17,6 @@ class PageController extends Controller
             'users' => json_encode($threadsAndUsers['users']),
         ])->render();
         $content = str_replace("!!chat!!", $chat, " $post->post_content");
-
         return $content;
     }
 }

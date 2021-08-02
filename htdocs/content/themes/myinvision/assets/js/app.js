@@ -2222,17 +2222,22 @@ function setCookie(name, value) {
             'participant_id': event.target.dataset.participantid
           }).then(function (response) {
             _this2.threadsData = response.data;
+            var newThreadId = response.data.new_thread_id;
+            axios.get('/chat/get_thread?thread_id=' + newThreadId).then(function (response) {
+              _this2.threadMessages = response.data;
+              _this2.currentThread = newThreadId;
+              setCookie('currentThread', JSON.stringify(newThreadId));
+              setCookie('threadMessages', JSON.stringify(response.data));
+            });
+          });
+        } else {
+          axios.get('/chat/get_thread?thread_id=' + event.target.dataset.id).then(function (response) {
+            _this2.threadMessages = response.data;
+            _this2.currentThread = event.target.dataset.id;
+            setCookie('currentThread', JSON.stringify(event.target.dataset.id));
+            setCookie('threadMessages', JSON.stringify(response.data));
           });
         }
-
-        var thread;
-        axios.get('/chat/get_thread?thread_id=' + event.target.dataset.id).then(function (response) {
-          _this2.threadMessages = response.data;
-          _this2.currentThread = event.target.dataset.id;
-          setCookie('currentThread', JSON.stringify(event.target.dataset.id));
-          setCookie('threadMessages', JSON.stringify(response.data));
-        });
-        console.log(this.threadMessages);
       }
     },
     invervalRecievingThreadData: function invervalRecievingThreadData() {
@@ -2297,7 +2302,7 @@ function setCookie(name, value) {
         reader.onload = function () {
           console.log(reader.result);
           axios.post('/chat/send_message_to_thread/', {
-            'body': reader.result,
+            'image': reader.result,
             'thread_id': formData.get('threadId') // 'file' : 'sdf'
 
           }).then(function (response) {// console.log(response.data)
@@ -20700,11 +20705,7 @@ var render = function() {
                             "\n                " +
                               _vm._s(
                                 thread.participant_id
-                                  ? _vm.usersData[thread.participant_id]
-                                      .first_name +
-                                      " " +
-                                      _vm.usersData[thread.participant_id]
-                                        .last_name
+                                  ? thread.first_name + " " + thread.last_name
                                   : thread.subject
                               ) +
                               "\n              "
@@ -20814,8 +20815,9 @@ var render = function() {
                                   "div",
                                   { staticClass: "chat-message__text" },
                                   [
-                                    message.body.length > 100
+                                    message.is_file
                                       ? _c("img", {
+                                          staticClass: "message_image",
                                           attrs: { src: message.body }
                                         })
                                       : _c("span", [
@@ -33132,15 +33134,14 @@ module.exports = g;
 /*!***************************************!*\
   !*** ./resources/components/Chat.vue ***!
   \***************************************/
-/*! no static exports found */
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Chat_vue_vue_type_template_id_5e6f09c9___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Chat.vue?vue&type=template&id=5e6f09c9& */ "./resources/components/Chat.vue?vue&type=template&id=5e6f09c9&");
 /* harmony import */ var _Chat_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Chat.vue?vue&type=script&lang=js& */ "./resources/components/Chat.vue?vue&type=script&lang=js&");
-/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _Chat_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__) if(["default"].indexOf(__WEBPACK_IMPORT_KEY__) < 0) (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _Chat_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
@@ -33170,7 +33171,7 @@ component.options.__file = "resources/components/Chat.vue"
 /*!****************************************************************!*\
   !*** ./resources/components/Chat.vue?vue&type=script&lang=js& ***!
   \****************************************************************/
-/*! no static exports found */
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -33238,7 +33239,7 @@ var app = new Vue({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! C:\OpenServer\domains\themosis\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! D:\OpenServer\domains\myinvision_t\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })
