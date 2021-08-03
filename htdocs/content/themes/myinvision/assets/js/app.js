@@ -20805,45 +20805,43 @@ var render = function() {
                           attrs: { src: _vm.usersData[messages[0].user_id].ava }
                         }),
                         _vm._v(" "),
-                        _vm._l(messages, function(message) {
-                          return _c(
-                            "div",
-                            { staticClass: "chat-message__user-messages" },
-                            [
-                              _c(
-                                "div",
-                                {
-                                  staticClass:
-                                    "chat-message__message_message-body"
-                                },
-                                [
-                                  _c(
-                                    "div",
-                                    { staticClass: "chat-message__text" },
-                                    [
-                                      message.is_file
-                                        ? _c("img", {
-                                            staticClass: "message_image",
-                                            attrs: { src: message.body }
-                                          })
-                                        : _c("span", [
-                                            _vm._v(_vm._s(message.body))
-                                          ])
-                                    ]
-                                  ),
-                                  _vm._v(" "),
-                                  _c(
-                                    "div",
-                                    { staticClass: "chat-message__time" },
-                                    [_vm._v(_vm._s(message.created_at))]
-                                  )
-                                ]
-                              )
-                            ]
-                          )
-                        })
-                      ],
-                      2
+                        _c(
+                          "div",
+                          { staticClass: "chat-message__user-messages" },
+                          _vm._l(messages, function(message) {
+                            return _c(
+                              "div",
+                              {
+                                staticClass:
+                                  "chat-message__message_message-body"
+                              },
+                              [
+                                _c(
+                                  "div",
+                                  { staticClass: "chat-message__text" },
+                                  [
+                                    message.is_file
+                                      ? _c("img", {
+                                          staticClass: "message_image",
+                                          attrs: { src: message.body }
+                                        })
+                                      : _c("span", [
+                                          _vm._v(_vm._s(message.body))
+                                        ])
+                                  ]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "div",
+                                  { staticClass: "chat-message__time" },
+                                  [_vm._v(_vm._s(message.created_at))]
+                                )
+                              ]
+                            )
+                          }),
+                          0
+                        )
+                      ]
                     )
                   ]
                 )
@@ -33247,7 +33245,7 @@ var app = new Vue({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\OpenServer\domains\myinvision_t\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\OpenServer\domains\themosis\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })

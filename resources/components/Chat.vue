@@ -109,8 +109,8 @@
             <div class="chat-message__message_message-content">
               <img class="thread-link__participant_ava"
                    v-bind:src="usersData[messages[0].user_id].ava">
-              <div v-for="message in messages" class="chat-message__user-messages">
-                <div class="chat-message__message_message-body">
+              <div class="chat-message__user-messages">
+                <div v-for="message in messages"  class="chat-message__message_message-body">
                   <div class="chat-message__text">
                     <img class="message_image" v-if="message.is_file" v-bind:src="message.body">
                     <span v-else>{{ message.body }}</span>
