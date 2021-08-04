@@ -33,6 +33,7 @@
   },
   "require": {
     "php": ">=7.1.0",
+    "cmgmyr/messenger": "^2.22",
     "johnpbloch/wordpress-core": "^5.6.0",
     "johnpbloch/wordpress-core-installer": "^2.0",
     "themosis/framework": "^2.0.0"

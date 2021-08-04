@@ -26,6 +26,7 @@ return [
     |
     */
     'providers' => [
+        Cmgmyr\Messenger\MessengerServiceProvider::class,
         Theme\Providers\AssetServiceProvider::class,
         Theme\Providers\RouteServiceProvider::class
     ],
