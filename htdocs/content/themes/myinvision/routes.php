@@ -1,8 +1,12 @@
 <?php
 
-//Route::get('/',
-//    [\Theme\Controllers\ChatController::class,
-//        'index'])->name('chat');
+Route::get('/',
+    [\Theme\Controllers\PageController::class,
+        'event'])->name('chat');
+
+Route::get('/checking',
+    [\Theme\Controllers\PageController::class,
+        'event']);
 //
 //Route::post('chat/create_thread/',
 //    [\Theme\Controllers\ThreadController::class,

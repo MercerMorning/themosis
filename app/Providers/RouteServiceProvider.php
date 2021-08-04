@@ -5,6 +5,7 @@ namespace App\Providers;
 use Themosis\Core\Support\Providers\RouteServiceProvider as RouteProvider;
 use Themosis\Support\Facades\Route;
 
+
 class RouteServiceProvider extends RouteProvider
 {
     /**

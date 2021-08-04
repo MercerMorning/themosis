@@ -138,6 +138,7 @@ return [
         Themosis\User\UserServiceProvider::class,
 
         // Application providers
+        \Illuminate\Broadcasting\BroadcastServiceProvider::class,
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
