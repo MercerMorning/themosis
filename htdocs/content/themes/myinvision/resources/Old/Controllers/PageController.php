@@ -9,8 +9,8 @@ class PageController extends Controller
 {
     public function index()
     {
-        $request = new Request(['thread_id' => 171]);
-        $threadC = new ThreadController();
+//        $request = new Request(['thread_id' => 171]);
+//        $threadC = new ThreadController();
 //        dd($threadC->getThreadMessages($request));
 
         global $post;
@@ -18,10 +18,11 @@ class PageController extends Controller
 //        dd($threadsAndUsers);
         $chat = view('front.chat', [
 //            'currentUser' => json_encode($currentUser->toArray()),
-            'threads' => json_encode($threadsAndUsers['threads']),
-            'users' => json_encode($threadsAndUsers['users']),
+//            'threads' => json_encode($threadsAndUsers['threads']),
+//            'users' => json_encode($threadsAndUsers['users']),
         ])->render();
-        $content = str_replace("!!chat!!", $chat, " $post->post_content");
-        return $content;
+        return $chat;
+//        $content = str_replace("!!chat!!", $chat, " $post->post_content");
+//        return $content;
     }
 }

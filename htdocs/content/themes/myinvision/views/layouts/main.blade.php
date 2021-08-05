@@ -10,5 +10,16 @@
 <body @php(body_class())>
 @yield('main_content')
 @footer
+{{--<script>--}}
+{{--    const socket = new WebSocket("ws://localhost:8999");--}}
+
+{{--    socket.onopen = () => {--}}
+{{--        socket.send("Hello!");--}}
+{{--    };--}}
+
+{{--    socket.onmessage = (data) => {--}}
+{{--        console.log(data.data);--}}
+{{--    };--}}
+{{--</script>--}}
 </body>
 </html>
