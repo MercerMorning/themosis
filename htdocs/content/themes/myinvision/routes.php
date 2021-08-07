@@ -19,14 +19,15 @@ Route::get('chat/get_threads/',
 Route::get('chat/get_thread/',
     [\Theme\Controllers\MessagesController::class,
         'showThread'])->name('get_thread');
+
+Route::post('chat/send_message_to_thread/',
+    [\Theme\Controllers\MessagesController::class,
+        'storeMessage'])->name('send_message_to_thread');
 //
 //Route::post('chat/send_message_to_user/',
 //    [\Theme\Controllers\PersonalCorrespondence::class,
 //        'sendMessage'])->name('send_message_to_user');
 //
-//Route::post('chat/send_message_to_thread/',
-//    [\Theme\Controllers\MessageController::class,
-//        'send'])->name('send_message_to_thread');
 //
 //Route::post('chat/invite_to_thread/',
 //    [\Theme\Controllers\ThreadController::class,

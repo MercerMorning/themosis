@@ -175,14 +175,14 @@ class MessagesController extends Controller
         return response('OK');
     }
 
-    public function storeMessage(Thread $thread, \Illuminate\Http\Request $request)
+    public function storeMessage(Request $request)
     {
         $message = Message::create([
-            'thread_id' => $thread->id,
+            'thread_id' => $request->get('thread_id'),
             'user_id' => AuthUser::currentUserId(),
             'body' => $request->get('body'),
         ]);
 
-        return response('OK');
+        return $this->showThread(new Request(['id' => $request->get('thread_id')]))['threadMessages'];
     }
 }

@@ -13,7 +13,7 @@
         <li v-for="thread in threadsData"
             v-on:click="showThread"
             v-bind:data-id="thread.id"
-            v-bind:class="[thread.id === currentThread
+            v-bind:class="[thread.id === currentThread.id
                ? 'menu-threads__item active'
                : 'menu-threads__item']">
           <a class="menu-threads__link">
@@ -71,7 +71,8 @@
           </div>
         </label>
       </div>
-      <form class="chat-footer">
+      <form class="chat-footer" v-on:submit.prevent="sendMessage">
+        <input type="hidden" name="threadId" v-bind:value="currentThread.id">
         <div class="chat-footer__input-wrpa">
           <label class="chat-footer__input-file">
             <svg width="20" height="18">
@@ -80,7 +81,7 @@
             <input type="file" name="file">
           </label>
           <label class="chat-footer__input-text">
-            <textarea class="input-message" type="text" name="text" placeholder="Введите сообщение"></textarea>
+            <textarea class="input-message" type="text" name="body" placeholder="Введите сообщение"></textarea>
           </label>
 
           <label class="chat-footer__send-message">
@@ -104,11 +105,12 @@
 <script>
 export default {
   mounted: function(){
+
     const socket = new WebSocket("ws://localhost:8999");
 
-    socket.onopen = () => {
-      socket.send("Hello!");
-    };
+    // socket.onopen = () => {
+    //   socket.send("Hello!");
+    // };
 
     socket.onmessage = (data) => {
       console.log(data.data);
@@ -123,6 +125,7 @@ export default {
   data: function () {
     {
       return {
+        socket : new WebSocket("ws://localhost:8999"),
         threadsData: JSON.parse(this.threads),
         currentUserData: JSON.parse(this.currentuser),
         currentThread: JSON.parse(this.currentthread) ?? null,
@@ -139,152 +142,28 @@ export default {
         this.currentThread = response.data.currentThread;
         this.threadMessages = response.data.threadMessages;
       })
-    }
+    },
+    sendMessage: function (event) {
+      let formData = new FormData(event.target);
+        this.socket.send(JSON.stringify({
+          thread_id: formData.get('threadId'),
+          body: formData.get('body')
+        }));
+      document.querySelector('.chat-footer').reset();
 
-      //   getThreads: function () {
-      //     return fetch('/')
-      //   },
-      //   sendMessage: function (event) {
-      //
-      //     let formFile = new FormData(event.target).get('file') ?? new FormData(event.target).get('file');
-      //
-      //     console.log(formFile.size)
-      //     if (formFile.size !== 0) {
-      //       var reader = new FileReader();
-      //       reader.readAsDataURL(formFile);
-      //       reader.onload = function () {
-      //         axios.post('/chat/send_message_to_thread/', {
-      //           'body': reader.result,
-      //           'thread_id': new FormData(event.target).get('threadId'),
-      //           // 'file' : 'sdf'
-      //         }).then(response => {
-      //           console.log(response.data)
-      //           // this.threadMessages = response.data
-      //         })
-      //       }
-      //     } else {
-      //       axios.post('/chat/send_message_to_thread/',  {
-      //         'body' : new FormData(event.target).get('body'),
-      //         'thread_id' : new FormData(event.target).get('threadId'),
-      //         // 'file' : 'sdf'
-      //       }).then(response => {
-      //         this.threadMessages = response.data
-      //       })
-      //     }
-      //     document.querySelector('.chat-footer').reset()
-      //
-      //   },
-      //   // addThread: function (event) {
-      //   //   event.preventDefault();
-      //   //   axios.post('/chat/create_thread/',  {
-      //   //     'name' : new FormData(event.target).get('name')
-      //   //   }).then( response => {
-      //   //     this.threadsData = response.data
-      //   //   })
-      //   // },
-      //   openThread: function (event) {
-      //     document.querySelector('.chat-footer').reset()
-      //     if (event.target.classList == 'menu-threads__link') {
-      //       if (!event.target.dataset.id) {
-      //         console.log(event.target.dataset.participantid)
-      //         axios.post('/chat/create_thread/',  {
-      //           'participant_id' : event.target.dataset.participantid
-      //         }).then( response => {
-      //           this.threadsData = response.data
-      //           let newThreadId = response.data.new_thread_id
-      //           axios.get('/chat/get_thread?thread_id=' +  newThreadId).then( response => {
-      //             this.threadMessages = response.data
-      //             this.currentThread = newThreadId;
-      //             setCookie('currentThread',  JSON.stringify(newThreadId))
-      //             setCookie('threadMessages',  JSON.stringify(response.data))
-      //           })
-      //         })
-      //
-      //       } else {
-      //         axios.get('/chat/get_thread?thread_id=' +  event.target.dataset.id).then( response => {
-      //           this.threadMessages = response.data
-      //           this.currentThread = event.target.dataset.id;
-      //           setCookie('currentThread',  JSON.stringify(event.target.dataset.id))
-      //           setCookie('threadMessages',  JSON.stringify(response.data))
-      //         })
-      //       }
-      //     }
-      //
-      //   },
-      //   invervalRecievingThreadData: function () {
-      //       setInterval(() => {
-      //         axios.get('/chat/get_thread?thread_id=' +  JSON.parse(getCookie('currentThread'))).then( response => {
-      //           this.threadMessages = response.data
-      //           this.currentThread = JSON.parse(getCookie('currentThread'));
-      //         }).catch(function (error) {
-      //           console.log(error)
-      //         })
-      //         axios.get('/chat/get_threads').then( response => {
-      //           this.threadsData = response.data
-      //         }).catch(function (error) {
-      //           console.log(error)
-      //         })
-      //       }, 3000)
-      //
-      //   },
-      //   openCreateThemeModal()
-      //   {
-      //     this.createNewTheme = true;
-      //     jQuery('.theme_participants_input').select2();
-      //   },
-      //   closeCreateThemeModal()
-      //   {
-      //     this.createNewTheme = false;
-      //   },
-      //   createNewThemeFunc: function (event) {
-      //     axios.post('/chat/create_thread/',  {
-      //       'name' : new FormData(event.target).get('name')
-      //     }).then( response => {
-      //       // this.threadsData = response.data
-      //       this.newThread = response.data.new_thread_id
-      //       let participantIds;
-      //       participantIds = jQuery('.theme_participants_input').find(':selected').map((itemId, element) => {
-      //           return element.value
-      //       })
-      //       // participantIds = jQuery('.theme_participants_input').find(':selected')
-      //       // participantIds = jQuery('.theme_participants_input').find(':selected').data('');
-      //       participantIds = participantIds.toArray()
-      //       axios.post('/chat/invite_to_thread/',  {
-      //         'thread_id' : this.newThread,
-      //         'participants_id' : participantIds
-      //       }).then( response => {
-      //         // console.log(new FormData(event.target).get('participants_id'))
-      //         console.log(response.data)
-      //         this.threadsData = response.data
-      //       })
-      //       this.newThread = null
-      //       this.createNewTheme = false;
-      //     })
-      //
-      //   },
-      //   sendImage: function()
-      //   {
-      //     // console.log(document.querySelector('.chat-footer'));
-      //     let formData = new FormData(document.querySelector('.chat-footer'));
-      //     if (formData.get('file').size !== 0) {
-      //       var reader = new FileReader();
-      //       reader.readAsDataURL(formData.get('file'));
-      //       reader.onload = function () {
-      //         console.log(reader.result);
-      //         axios.post('/chat/send_message_to_thread/', {
-      //           'image': reader.result,
-      //           'thread_id': formData.get('threadId'),
-      //           // 'file' : 'sdf'
-      //         }).then(response => {
-      //           // console.log(response.data)
-      //           // this.threadMessages = response.data
-      //         })
-      //       }
-      //     }
-      //     document.querySelector('.chat-footer').reset()
-      //   }
       // }
-    }
+
+      // axios.post('/chat/send_message_to_thread/',  {
+      //   'body' : formData.get('body'),
+      //   'thread_id' : formData.get('threadId'),
+      //   // 'file' : 'sdf'
+      // }).then(response => {
+      //   document.querySelector('.chat-footer').reset();
+      //   this.threadMessages = response.data
+      // })
+
+    },
+  }
 
 }
 
