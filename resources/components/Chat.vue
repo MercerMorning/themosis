@@ -112,8 +112,11 @@ export default {
     //   socket.send("Hello!");
     // };
 
-    socket.onmessage = (data) => {
-      console.log(data.data);
+    socket.onmessage = (response) => {
+      let parsedResponse = JSON.parse(response.data);
+      this.threadsData = parsedResponse.threads
+      this.currentThread = parsedResponse.currentThread;
+      this.threadMessages = parsedResponse.threadMessages;
     };
   },
   props: {
@@ -121,6 +124,7 @@ export default {
     currentuser: String,
     currentthread: String,
     threadmessages: String,
+    usertoken: String,
   },
   data: function () {
     {
@@ -129,7 +133,8 @@ export default {
         threadsData: JSON.parse(this.threads),
         currentUserData: JSON.parse(this.currentuser),
         currentThread: JSON.parse(this.currentthread) ?? null,
-        threadMessages: JSON.parse(this.threadmessages) ?? null
+        threadMessages: JSON.parse(this.threadmessages) ?? null,
+        userToken: JSON.parse(this.usertoken) ?? null
       }
     }
   },
@@ -146,8 +151,10 @@ export default {
     sendMessage: function (event) {
       let formData = new FormData(event.target);
         this.socket.send(JSON.stringify({
+          user_id: this.currentUserData.id,
           thread_id: formData.get('threadId'),
-          body: formData.get('body')
+          body: formData.get('body'),
+          token: this.userToken,
         }));
       document.querySelector('.chat-footer').reset();
 

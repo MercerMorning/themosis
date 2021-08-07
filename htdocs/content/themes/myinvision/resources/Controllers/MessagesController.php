@@ -14,14 +14,16 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Theme\Services\ApiTokenController;
+use Theme\Services\ApiTokenService;
 use Theme\Services\UserPrepareService;
 
 class MessagesController extends Controller
 {
     public function showChat()
     {
-//        dd($this->showThread(new Request(['id' => 17])));
         global $post;
+        $userToken = ApiTokenService::update()['token'];
         $threads = $this->getAllThreads();
         $currentUserData = UserPrepareService::currentUserPresenter();
         $threadMessages = null;
@@ -32,6 +34,7 @@ class MessagesController extends Controller
             $currentThread = $threadInfo['currentThread'];
         }
         $chat = view('front.chat', [
+            'userToken' => json_encode($userToken),
             'currentThread' => json_encode($currentThread),
             'threadMessages' => json_encode($threadMessages),
             'currentUser' => json_encode($currentUserData),
@@ -40,9 +43,9 @@ class MessagesController extends Controller
         return $chat;
     }
 
-    public function getAllThreads()
+    public function getAllThreads($userId = null)
     {
-        $threads =  Thread::forUser(AuthUser::currentUserId())
+        $threads =  Thread::forUser($userId ?? AuthUser::currentUserId())
             ->latest('updated_at')
             ->get();;
         $threads->map(function ($thread) {
@@ -69,7 +72,7 @@ class MessagesController extends Controller
     public function showThread(Request $request)
     {
         $id = $request->get('id');
-        $threads = $this->getAllThreads();
+        $threads = $this->getAllThreads($request->get('user_id'));
 
         try {
             $thread = Thread::find($id);
@@ -77,7 +80,7 @@ class MessagesController extends Controller
             return response('The thread with ID: ' . $id . ' was not found.', 404);
         }
 
-        $userId = Auth::id();
+        $userId = Auth::id() ?? $request->get('user_id');
 
         $thread->markAsRead($userId);
 
@@ -177,12 +180,22 @@ class MessagesController extends Controller
 
     public function storeMessage(Request $request)
     {
+        $userToken = User::find($request->get('user_id'))
+            ->token()
+            ->api_token;
+        $requestToken = $request->get('token');
+
+        if (!$userToken == $requestToken) {
+            return response('', 400);
+        }
+
         $message = Message::create([
             'thread_id' => $request->get('thread_id'),
-            'user_id' => AuthUser::currentUserId(),
+            'user_id' => $request->get('user_id'),
             'body' => $request->get('body'),
         ]);
 
-        return $this->showThread(new Request(['id' => $request->get('thread_id')]))['threadMessages'];
+//        return $this->showThread(new Request(['user_id' => $request->get('user_id'),'id' => $request->get('thread_id')]))['threadMessages'];
+        return $this->showThread(new Request(['user_id' => $request->get('user_id'),'id' => $request->get('thread_id')]));
     }
 }

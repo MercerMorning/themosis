@@ -2061,50 +2061,59 @@ __webpack_require__.r(__webpack_exports__);
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
   mounted: function mounted() {
+    var _this = this;
+
     var socket = new WebSocket("ws://localhost:8999"); // socket.onopen = () => {
     //   socket.send("Hello!");
     // };
 
-    socket.onmessage = function (data) {
-      console.log(data.data);
+    socket.onmessage = function (response) {
+      var parsedResponse = JSON.parse(response.data);
+      _this.threadsData = parsedResponse.threads;
+      _this.currentThread = parsedResponse.currentThread;
+      _this.threadMessages = parsedResponse.threadMessages;
     };
   },
   props: {
     threads: String,
     currentuser: String,
     currentthread: String,
-    threadmessages: String
+    threadmessages: String,
+    usertoken: String
   },
   data: function data() {
     {
-      var _JSON$parse, _JSON$parse2;
+      var _JSON$parse, _JSON$parse2, _JSON$parse3;
 
       return {
         socket: new WebSocket("ws://localhost:8999"),
         threadsData: JSON.parse(this.threads),
         currentUserData: JSON.parse(this.currentuser),
         currentThread: (_JSON$parse = JSON.parse(this.currentthread)) !== null && _JSON$parse !== void 0 ? _JSON$parse : null,
-        threadMessages: (_JSON$parse2 = JSON.parse(this.threadmessages)) !== null && _JSON$parse2 !== void 0 ? _JSON$parse2 : null
+        threadMessages: (_JSON$parse2 = JSON.parse(this.threadmessages)) !== null && _JSON$parse2 !== void 0 ? _JSON$parse2 : null,
+        userToken: (_JSON$parse3 = JSON.parse(this.usertoken)) !== null && _JSON$parse3 !== void 0 ? _JSON$parse3 : null
       };
     }
   },
   methods: {
     showThread: function showThread(e) {
-      var _this = this;
+      var _this2 = this;
 
       var idItem = event.target.closest('.menu-threads__item');
       axios.get('/chat/get_thread?id=' + idItem.dataset.id).then(function (response) {
         document.cookie = "currentThreadId=" + response.data.currentThread.id;
-        _this.threadsData = response.data.threads;
-        _this.currentThread = response.data.currentThread;
-        _this.threadMessages = response.data.threadMessages;
+        _this2.threadsData = response.data.threads;
+        _this2.currentThread = response.data.currentThread;
+        _this2.threadMessages = response.data.threadMessages;
       });
     },
     sendMessage: function sendMessage(event) {
       var formData = new FormData(event.target);
       this.socket.send(JSON.stringify({
+        user_id: this.currentUserData.id,
         thread_id: formData.get('threadId'),
-        body: formData.get('body')
+        body: formData.get('body'),
+        token: this.userToken
       }));
       document.querySelector('.chat-footer').reset(); // }
       // axios.post('/chat/send_message_to_thread/',  {
