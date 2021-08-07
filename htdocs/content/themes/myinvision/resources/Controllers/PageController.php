@@ -10,6 +10,7 @@ class PageController extends Controller
     public function index()
     {
         global $post;
+        $threads =
 //        $threadsAndUsers = ThreadsListService::getWholeList();
 //        dd($threadsAndUsers);
         $chat = view('front.chat', [

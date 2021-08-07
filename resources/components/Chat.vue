@@ -3,37 +3,28 @@
     <div class="menu-threads">
       <div class="menu-threads__current-user">
         <a class="menu-threads__link current-user">
-          <img class="thread-link__participant_ava" src="/content/themes/myinvision/assets/images/person.png">
+          <img class="thread-link__participant_ava" v-bind:src="currentUserData.ava">
           <div class="thread-link__current-user_name">
-            Phillip Torff
+            {{ currentUserData.first_name + ' ' +  currentUserData.last_name}}
           </div>
         </a>
       </div>
       <ul class="menu-threads__list">
-        <li class="menu-threads__item active">
+        <li v-for="thread in threadsData"
+            v-on:click="showThread"
+            v-bind:data-id="thread.id"
+            v-bind:class="[thread.id === currentThread
+               ? 'menu-threads__item active'
+               : 'menu-threads__item']">
           <a class="menu-threads__link">
-            <img class="thread-link__participant_ava" src="/content/themes/myinvision/assets/images/person.png">
+<!--            <img class="thread-link__participant_ava" src="/content/themes/myinvision/assets/images/person.png">-->
             <div class="thread-link__dialog">
               <div class="thread-link__content">
-                <span class="thread-participant_name">Phillip Torff</span>
-                <span class="thread-participant_message">Thank you, Phillip!</span>
+                <span class="thread-participant_name">{{ thread.subject }}</span>
+                <span class="thread-participant_message">{{ thread.lastMessage }}</span>
               </div>
               <div class="thread-link__date-time">
-                <span>17/06/2020</span>
-              </div>
-            </div>
-          </a>
-        </li>
-        <li class="menu-threads__item">
-          <a class="menu-threads__link">
-            <img class="thread-link__participant_ava" src="/content/themes/myinvision/assets/images/person.png">
-            <div class="thread-link__dialog">
-              <div class="thread-link__content">
-                <span class="thread-participant_name">Phillip Torff</span>
-                <span class="thread-participant_message">Thank you, Phillip!</span>
-              </div>
-              <div class="thread-link__date-time">
-                <span>17/06/2020</span>
+                <span>{{ thread.datetime }}</span>
               </div>
             </div>
           </a>
@@ -140,161 +131,171 @@ export default {
   },
   props: {
     threads: String,
-    users: String,
-    currentUser: String,
+    currentuser: String,
   },
   data: function () {
     {
       return {
-
+        threadsData: JSON.parse(this.threads),
+        currentUserData: JSON.parse(this.currentuser),
+        currentThread: this.currentThread ?? null,
       }
     }
   },
   methods: {
-    //   getThreads: function () {
-    //     return fetch('/')
-    //   },
-    //   sendMessage: function (event) {
-    //
-    //     let formFile = new FormData(event.target).get('file') ?? new FormData(event.target).get('file');
-    //
-    //     console.log(formFile.size)
-    //     if (formFile.size !== 0) {
-    //       var reader = new FileReader();
-    //       reader.readAsDataURL(formFile);
-    //       reader.onload = function () {
-    //         axios.post('/chat/send_message_to_thread/', {
-    //           'body': reader.result,
-    //           'thread_id': new FormData(event.target).get('threadId'),
-    //           // 'file' : 'sdf'
-    //         }).then(response => {
-    //           console.log(response.data)
-    //           // this.threadMessages = response.data
-    //         })
-    //       }
-    //     } else {
-    //       axios.post('/chat/send_message_to_thread/',  {
-    //         'body' : new FormData(event.target).get('body'),
-    //         'thread_id' : new FormData(event.target).get('threadId'),
-    //         // 'file' : 'sdf'
-    //       }).then(response => {
-    //         this.threadMessages = response.data
-    //       })
-    //     }
-    //     document.querySelector('.chat-footer').reset()
-    //
-    //   },
-    //   // addThread: function (event) {
-    //   //   event.preventDefault();
-    //   //   axios.post('/chat/create_thread/',  {
-    //   //     'name' : new FormData(event.target).get('name')
-    //   //   }).then( response => {
-    //   //     this.threadsData = response.data
-    //   //   })
-    //   // },
-    //   openThread: function (event) {
-    //     document.querySelector('.chat-footer').reset()
-    //     if (event.target.classList == 'menu-threads__link') {
-    //       if (!event.target.dataset.id) {
-    //         console.log(event.target.dataset.participantid)
-    //         axios.post('/chat/create_thread/',  {
-    //           'participant_id' : event.target.dataset.participantid
-    //         }).then( response => {
-    //           this.threadsData = response.data
-    //           let newThreadId = response.data.new_thread_id
-    //           axios.get('/chat/get_thread?thread_id=' +  newThreadId).then( response => {
-    //             this.threadMessages = response.data
-    //             this.currentThread = newThreadId;
-    //             setCookie('currentThread',  JSON.stringify(newThreadId))
-    //             setCookie('threadMessages',  JSON.stringify(response.data))
-    //           })
-    //         })
-    //
-    //       } else {
-    //         axios.get('/chat/get_thread?thread_id=' +  event.target.dataset.id).then( response => {
-    //           this.threadMessages = response.data
-    //           this.currentThread = event.target.dataset.id;
-    //           setCookie('currentThread',  JSON.stringify(event.target.dataset.id))
-    //           setCookie('threadMessages',  JSON.stringify(response.data))
-    //         })
-    //       }
-    //     }
-    //
-    //   },
-    //   invervalRecievingThreadData: function () {
-    //       setInterval(() => {
-    //         axios.get('/chat/get_thread?thread_id=' +  JSON.parse(getCookie('currentThread'))).then( response => {
-    //           this.threadMessages = response.data
-    //           this.currentThread = JSON.parse(getCookie('currentThread'));
-    //         }).catch(function (error) {
-    //           console.log(error)
-    //         })
-    //         axios.get('/chat/get_threads').then( response => {
-    //           this.threadsData = response.data
-    //         }).catch(function (error) {
-    //           console.log(error)
-    //         })
-    //       }, 3000)
-    //
-    //   },
-    //   openCreateThemeModal()
-    //   {
-    //     this.createNewTheme = true;
-    //     jQuery('.theme_participants_input').select2();
-    //   },
-    //   closeCreateThemeModal()
-    //   {
-    //     this.createNewTheme = false;
-    //   },
-    //   createNewThemeFunc: function (event) {
-    //     axios.post('/chat/create_thread/',  {
-    //       'name' : new FormData(event.target).get('name')
-    //     }).then( response => {
-    //       // this.threadsData = response.data
-    //       this.newThread = response.data.new_thread_id
-    //       let participantIds;
-    //       participantIds = jQuery('.theme_participants_input').find(':selected').map((itemId, element) => {
-    //           return element.value
-    //       })
-    //       // participantIds = jQuery('.theme_participants_input').find(':selected')
-    //       // participantIds = jQuery('.theme_participants_input').find(':selected').data('');
-    //       participantIds = participantIds.toArray()
-    //       axios.post('/chat/invite_to_thread/',  {
-    //         'thread_id' : this.newThread,
-    //         'participants_id' : participantIds
-    //       }).then( response => {
-    //         // console.log(new FormData(event.target).get('participants_id'))
-    //         console.log(response.data)
-    //         this.threadsData = response.data
-    //       })
-    //       this.newThread = null
-    //       this.createNewTheme = false;
-    //     })
-    //
-    //   },
-    //   sendImage: function()
-    //   {
-    //     // console.log(document.querySelector('.chat-footer'));
-    //     let formData = new FormData(document.querySelector('.chat-footer'));
-    //     if (formData.get('file').size !== 0) {
-    //       var reader = new FileReader();
-    //       reader.readAsDataURL(formData.get('file'));
-    //       reader.onload = function () {
-    //         console.log(reader.result);
-    //         axios.post('/chat/send_message_to_thread/', {
-    //           'image': reader.result,
-    //           'thread_id': formData.get('threadId'),
-    //           // 'file' : 'sdf'
-    //         }).then(response => {
-    //           // console.log(response.data)
-    //           // this.threadMessages = response.data
-    //         })
-    //       }
-    //     }
-    //     document.querySelector('.chat-footer').reset()
-    //   }
-    // }
-  }
+    showThread : function (e) {
+      let idItem = event.target.closest('.menu-threads__item');
+      axios.get('/chat/get_thread?id=' +  idItem.dataset.id).then( response => {
+        this.threadMessages = response.data
+        this.currentThread = idItem.id;
+      })
+    }
+
+      //   getThreads: function () {
+      //     return fetch('/')
+      //   },
+      //   sendMessage: function (event) {
+      //
+      //     let formFile = new FormData(event.target).get('file') ?? new FormData(event.target).get('file');
+      //
+      //     console.log(formFile.size)
+      //     if (formFile.size !== 0) {
+      //       var reader = new FileReader();
+      //       reader.readAsDataURL(formFile);
+      //       reader.onload = function () {
+      //         axios.post('/chat/send_message_to_thread/', {
+      //           'body': reader.result,
+      //           'thread_id': new FormData(event.target).get('threadId'),
+      //           // 'file' : 'sdf'
+      //         }).then(response => {
+      //           console.log(response.data)
+      //           // this.threadMessages = response.data
+      //         })
+      //       }
+      //     } else {
+      //       axios.post('/chat/send_message_to_thread/',  {
+      //         'body' : new FormData(event.target).get('body'),
+      //         'thread_id' : new FormData(event.target).get('threadId'),
+      //         // 'file' : 'sdf'
+      //       }).then(response => {
+      //         this.threadMessages = response.data
+      //       })
+      //     }
+      //     document.querySelector('.chat-footer').reset()
+      //
+      //   },
+      //   // addThread: function (event) {
+      //   //   event.preventDefault();
+      //   //   axios.post('/chat/create_thread/',  {
+      //   //     'name' : new FormData(event.target).get('name')
+      //   //   }).then( response => {
+      //   //     this.threadsData = response.data
+      //   //   })
+      //   // },
+      //   openThread: function (event) {
+      //     document.querySelector('.chat-footer').reset()
+      //     if (event.target.classList == 'menu-threads__link') {
+      //       if (!event.target.dataset.id) {
+      //         console.log(event.target.dataset.participantid)
+      //         axios.post('/chat/create_thread/',  {
+      //           'participant_id' : event.target.dataset.participantid
+      //         }).then( response => {
+      //           this.threadsData = response.data
+      //           let newThreadId = response.data.new_thread_id
+      //           axios.get('/chat/get_thread?thread_id=' +  newThreadId).then( response => {
+      //             this.threadMessages = response.data
+      //             this.currentThread = newThreadId;
+      //             setCookie('currentThread',  JSON.stringify(newThreadId))
+      //             setCookie('threadMessages',  JSON.stringify(response.data))
+      //           })
+      //         })
+      //
+      //       } else {
+      //         axios.get('/chat/get_thread?thread_id=' +  event.target.dataset.id).then( response => {
+      //           this.threadMessages = response.data
+      //           this.currentThread = event.target.dataset.id;
+      //           setCookie('currentThread',  JSON.stringify(event.target.dataset.id))
+      //           setCookie('threadMessages',  JSON.stringify(response.data))
+      //         })
+      //       }
+      //     }
+      //
+      //   },
+      //   invervalRecievingThreadData: function () {
+      //       setInterval(() => {
+      //         axios.get('/chat/get_thread?thread_id=' +  JSON.parse(getCookie('currentThread'))).then( response => {
+      //           this.threadMessages = response.data
+      //           this.currentThread = JSON.parse(getCookie('currentThread'));
+      //         }).catch(function (error) {
+      //           console.log(error)
+      //         })
+      //         axios.get('/chat/get_threads').then( response => {
+      //           this.threadsData = response.data
+      //         }).catch(function (error) {
+      //           console.log(error)
+      //         })
+      //       }, 3000)
+      //
+      //   },
+      //   openCreateThemeModal()
+      //   {
+      //     this.createNewTheme = true;
+      //     jQuery('.theme_participants_input').select2();
+      //   },
+      //   closeCreateThemeModal()
+      //   {
+      //     this.createNewTheme = false;
+      //   },
+      //   createNewThemeFunc: function (event) {
+      //     axios.post('/chat/create_thread/',  {
+      //       'name' : new FormData(event.target).get('name')
+      //     }).then( response => {
+      //       // this.threadsData = response.data
+      //       this.newThread = response.data.new_thread_id
+      //       let participantIds;
+      //       participantIds = jQuery('.theme_participants_input').find(':selected').map((itemId, element) => {
+      //           return element.value
+      //       })
+      //       // participantIds = jQuery('.theme_participants_input').find(':selected')
+      //       // participantIds = jQuery('.theme_participants_input').find(':selected').data('');
+      //       participantIds = participantIds.toArray()
+      //       axios.post('/chat/invite_to_thread/',  {
+      //         'thread_id' : this.newThread,
+      //         'participants_id' : participantIds
+      //       }).then( response => {
+      //         // console.log(new FormData(event.target).get('participants_id'))
+      //         console.log(response.data)
+      //         this.threadsData = response.data
+      //       })
+      //       this.newThread = null
+      //       this.createNewTheme = false;
+      //     })
+      //
+      //   },
+      //   sendImage: function()
+      //   {
+      //     // console.log(document.querySelector('.chat-footer'));
+      //     let formData = new FormData(document.querySelector('.chat-footer'));
+      //     if (formData.get('file').size !== 0) {
+      //       var reader = new FileReader();
+      //       reader.readAsDataURL(formData.get('file'));
+      //       reader.onload = function () {
+      //         console.log(reader.result);
+      //         axios.post('/chat/send_message_to_thread/', {
+      //           'image': reader.result,
+      //           'thread_id': formData.get('threadId'),
+      //           // 'file' : 'sdf'
+      //         }).then(response => {
+      //           // console.log(response.data)
+      //           // this.threadMessages = response.data
+      //         })
+      //       }
+      //     }
+      //     document.querySelector('.chat-footer').reset()
+      //   }
+      // }
+    }
+
 }
 
 

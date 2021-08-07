@@ -2073,15 +2073,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   mounted: function mounted() {
     var socket = new WebSocket("ws://localhost:8999");
@@ -2096,15 +2087,29 @@ __webpack_require__.r(__webpack_exports__);
   },
   props: {
     threads: String,
-    users: String,
-    currentUser: String
+    currentuser: String
   },
   data: function data() {
     {
-      return {};
+      var _this$currentThread;
+
+      return {
+        threadsData: JSON.parse(this.threads),
+        currentUserData: JSON.parse(this.currentuser),
+        currentThread: (_this$currentThread = this.currentThread) !== null && _this$currentThread !== void 0 ? _this$currentThread : null
+      };
     }
   },
-  methods: {//   getThreads: function () {
+  methods: {
+    showThread: function showThread(e) {
+      var _this = this;
+
+      var idItem = event.target.closest('.menu-threads__item');
+      axios.get('/chat/get_thread?id=' + idItem.dataset.id).then(function (response) {
+        _this.threadMessages = response.data;
+        _this.currentThread = idItem.id;
+      });
+    } //   getThreads: function () {
     //     return fetch('/')
     //   },
     //   sendMessage: function (event) {
@@ -2247,6 +2252,7 @@ __webpack_require__.r(__webpack_exports__);
     //     document.querySelector('.chat-footer').reset()
     //   }
     // }
+
   }
 });
 
@@ -14274,7 +14280,67 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "chat-container" }, [
-    _vm._m(0),
+    _c("div", { staticClass: "menu-threads" }, [
+      _c("div", { staticClass: "menu-threads__current-user" }, [
+        _c("a", { staticClass: "menu-threads__link current-user" }, [
+          _c("img", {
+            staticClass: "thread-link__participant_ava",
+            attrs: { src: _vm.currentUserData.ava }
+          }),
+          _vm._v(" "),
+          _c("div", { staticClass: "thread-link__current-user_name" }, [
+            _vm._v(
+              "\n            " +
+                _vm._s(
+                  _vm.currentUserData.first_name +
+                    " " +
+                    _vm.currentUserData.last_name
+                ) +
+                "\n          "
+            )
+          ])
+        ])
+      ]),
+      _vm._v(" "),
+      _c(
+        "ul",
+        { staticClass: "menu-threads__list" },
+        _vm._l(_vm.threadsData, function(thread) {
+          return _c(
+            "li",
+            {
+              class: [
+                thread.id === _vm.currentThread
+                  ? "menu-threads__item active"
+                  : "menu-threads__item"
+              ],
+              attrs: { "data-id": thread.id },
+              on: { click: _vm.showThread }
+            },
+            [
+              _c("a", { staticClass: "menu-threads__link" }, [
+                _c("div", { staticClass: "thread-link__dialog" }, [
+                  _c("div", { staticClass: "thread-link__content" }, [
+                    _c("span", { staticClass: "thread-participant_name" }, [
+                      _vm._v(_vm._s(thread.subject))
+                    ]),
+                    _vm._v(" "),
+                    _c("span", { staticClass: "thread-participant_message" }, [
+                      _vm._v(_vm._s(thread.lastMessage))
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "thread-link__date-time" }, [
+                    _c("span", [_vm._v(_vm._s(thread.datetime))])
+                  ])
+                ])
+              ])
+            ]
+          )
+        }),
+        0
+      )
+    ]),
     _vm._v(" "),
     _c("div", { staticClass: "chat mobile-hidden" }, [
       _c("div", { staticClass: "chat__participant-chat" }, [
@@ -14294,7 +14360,7 @@ var render = function() {
         })
       ]),
       _vm._v(" "),
-      _vm._m(1),
+      _vm._m(0),
       _vm._v(" "),
       _c("form", { staticClass: "chat-footer" }, [
         _c("div", { staticClass: "chat-footer__input-wrpa" }, [
@@ -14311,10 +14377,10 @@ var render = function() {
             _c("input", { attrs: { type: "file", name: "file" } })
           ]),
           _vm._v(" "),
-          _vm._m(2),
+          _vm._m(1),
           _vm._v(" "),
           _c("label", { staticClass: "chat-footer__send-message" }, [
-            _vm._m(3),
+            _vm._m(2),
             _vm._v(" "),
             _c("svg", { attrs: { width: "20", height: "18" } }, [
               _c("use", {
@@ -14335,86 +14401,11 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "menu-threads" }, [
-      _c("div", { staticClass: "menu-threads__current-user" }, [
-        _c("a", { staticClass: "menu-threads__link current-user" }, [
-          _c("img", {
-            staticClass: "thread-link__participant_ava",
-            attrs: {
-              src: "/content/themes/myinvision/assets/images/person.png"
-            }
-          }),
-          _vm._v(" "),
-          _c("div", { staticClass: "thread-link__current-user_name" }, [
-            _vm._v("\n          Phillip Torff\n        ")
-          ])
-        ])
-      ]),
-      _vm._v(" "),
-      _c("ul", { staticClass: "menu-threads__list" }, [
-        _c("li", { staticClass: "menu-threads__item active" }, [
-          _c("a", { staticClass: "menu-threads__link" }, [
-            _c("img", {
-              staticClass: "thread-link__participant_ava",
-              attrs: {
-                src: "/content/themes/myinvision/assets/images/person.png"
-              }
-            }),
-            _vm._v(" "),
-            _c("div", { staticClass: "thread-link__dialog" }, [
-              _c("div", { staticClass: "thread-link__content" }, [
-                _c("span", { staticClass: "thread-participant_name" }, [
-                  _vm._v("Phillip Torff")
-                ]),
-                _vm._v(" "),
-                _c("span", { staticClass: "thread-participant_message" }, [
-                  _vm._v("Thank you, Phillip!")
-                ])
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "thread-link__date-time" }, [
-                _c("span", [_vm._v("17/06/2020")])
-              ])
-            ])
-          ])
-        ]),
-        _vm._v(" "),
-        _c("li", { staticClass: "menu-threads__item" }, [
-          _c("a", { staticClass: "menu-threads__link" }, [
-            _c("img", {
-              staticClass: "thread-link__participant_ava",
-              attrs: {
-                src: "/content/themes/myinvision/assets/images/person.png"
-              }
-            }),
-            _vm._v(" "),
-            _c("div", { staticClass: "thread-link__dialog" }, [
-              _c("div", { staticClass: "thread-link__content" }, [
-                _c("span", { staticClass: "thread-participant_name" }, [
-                  _vm._v("Phillip Torff")
-                ]),
-                _vm._v(" "),
-                _c("span", { staticClass: "thread-participant_message" }, [
-                  _vm._v("Thank you, Phillip!")
-                ])
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "thread-link__date-time" }, [
-                _c("span", [_vm._v("17/06/2020")])
-              ])
-            ])
-          ])
-        ])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
     return _c("div", { staticClass: "chat-body" }, [
       _c("div", { staticClass: "chat-message__date" }, [
-        _c("span", [_vm._v("\n                  17.06.2021\n              ")])
+        _c("span", [
+          _vm._v("\n                    17.06.2021\n                ")
+        ])
       ]),
       _vm._v(" "),
       _c(
@@ -14439,7 +14430,7 @@ var staticRenderFns = [
             _c("div", { staticClass: "chat-message__user-messages" }, [
               _c("div", { staticClass: "chat-message__message_message-body" }, [
                 _c("div", { staticClass: "chat-message__text" }, [
-                  _vm._v("\n                Хай\n              ")
+                  _vm._v("\n                  Хай\n                ")
                 ]),
                 _vm._v(" "),
                 _c("div", { staticClass: "chat-message__time" }, [
@@ -14449,7 +14440,7 @@ var staticRenderFns = [
               _vm._v(" "),
               _c("div", { staticClass: "chat-message__message_message-body" }, [
                 _c("div", { staticClass: "chat-message__text" }, [
-                  _vm._v("\n                Хай\n              ")
+                  _vm._v("\n                  Хай\n                ")
                 ]),
                 _vm._v(" "),
                 _c("div", { staticClass: "chat-message__time" }, [
@@ -14472,7 +14463,7 @@ var staticRenderFns = [
             _c("div", { staticClass: "chat-message__user-messages" }, [
               _c("div", { staticClass: "chat-message__message_message-body" }, [
                 _c("div", { staticClass: "chat-message__text" }, [
-                  _vm._v("\n                Хай\n              ")
+                  _vm._v("\n                  Хай\n                ")
                 ]),
                 _vm._v(" "),
                 _c("div", { staticClass: "chat-message__time" }, [
@@ -14482,7 +14473,7 @@ var staticRenderFns = [
               _vm._v(" "),
               _c("div", { staticClass: "chat-message__message_message-body" }, [
                 _c("div", { staticClass: "chat-message__text" }, [
-                  _vm._v("\n                Хай\n              ")
+                  _vm._v("\n                  Хай\n                ")
                 ]),
                 _vm._v(" "),
                 _c("div", { staticClass: "chat-message__time" }, [
@@ -14523,7 +14514,7 @@ var staticRenderFns = [
       [
         _c("span", { staticClass: "send-button_text" }, [
           _vm._v(
-            "\n                              Отправить\n                          "
+            "\n                                Отправить\n                            "
           )
         ])
       ]

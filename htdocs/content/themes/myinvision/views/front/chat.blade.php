@@ -2,8 +2,8 @@
 @section('main_content')
         <div id="app">
                 <chat-component
-{{--                        threads="{{ $threads }}"--}}
-{{--                        users="{{ $users }}"--}}
+                        currentuser="{{ $currentUser }}"
+                        threads="{{ $threads }}"
                 >
                 </chat-component>
             </div>

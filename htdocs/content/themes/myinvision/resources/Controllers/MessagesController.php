@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Theme\Controllers;
 
+use Illuminate\Routing\Controller;
+use Symfony\Component\Console\Helper\Helper;
 use Theme\Helpers\AuthUser;
 use Theme\Models\User;
 use Carbon\Carbon;
@@ -10,15 +12,44 @@ use Cmgmyr\Messenger\Models\Participant;
 use Cmgmyr\Messenger\Models\Thread;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Theme\Services\UserPrepareService;
 
 class MessagesController extends Controller
 {
+    public function showChat()
+    {
+        global $post;
+
+        $threads = $this->getAllThreads();
+        $threads->map(function ($thread) {
+            $lastMessageData = $thread
+                ->messages()
+                ->get()
+                ->last();
+            $thread->lastMessage =
+                UserPrepareService::threadPresenterLastMessage(
+                    $lastMessageData->user_id, $lastMessageData->body
+                );
+            $thread->datetime = Carbon::parse($thread->updated_at)->format('d/m/Y');
+            return $thread;
+        });
+        $threads = $threads->sortBy('updated_at');
+        $currentUserData = UserPrepareService::currentUserPresenter();
+        $chat = view('front.chat', [
+            'currentUser' => json_encode($currentUserData),
+            'threads' => json_encode($threads),
+        ])->render();
+        return $chat;
+    }
+
     public function getAllThreads()
     {
-        $threads = Thread::getAllLatest()->get();
-        return response(compact($threads));
+        $threads =  Thread::forUser(AuthUser::currentUserId())
+            ->latest('updated_at')
+            ->get();;
+        return $threads;
     }
     /**
      * Shows a message thread.
@@ -26,9 +57,10 @@ class MessagesController extends Controller
      * @param $id
      * @return mixed
      */
-    public function showThread($id)
+    public function showThread(Request $request)
     {
-        $threads = Thread::getAllLatest()->get();
+        $id = $request->get('id');
+        $threads = $this->getAllThreads();
 
         try {
             $thread = Thread::find($id);
@@ -41,13 +73,16 @@ class MessagesController extends Controller
         $thread->markAsRead($userId);
 
         $query = $thread->messages()
-            ->with('user')
+//            ->with('user')
             ->latest();
 
         $messages = $query->get();
 //        $messages->load('user:id,surname,first_name,middle_name');
-
-        return response(compact($threads, $thread, $messages));
+        return [
+            'threads' => $threads,
+            'currentThread' => $thread,
+            'threadMessages' => $messages
+        ];
     }
 
     /**
@@ -55,23 +90,21 @@ class MessagesController extends Controller
      *
      * @return mixed
      */
-    public function store()
+    public function store(Request $request)
     {
-        $input = Request::all();
-
+        $input = $request->all();
         $thread = Thread::create([
             'subject' => $input['subject'],
         ]);
 
         $threads = Thread::getAllLatest()->get();
-
         Participant::create([
             'thread_id' => $thread->id,
             'user_id' => AuthUser::currentUserId(),
             'last_read' => new Carbon,
         ]);
 
-        if (Request::has('recipients')) {
+        if ($request->has('recipients')) {
             $thread->addParticipant($input['recipients']);
         }
 

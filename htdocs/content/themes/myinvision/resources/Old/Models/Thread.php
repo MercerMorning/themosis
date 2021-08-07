@@ -19,4 +19,17 @@ class Thread extends Model
     {
         return $this->hasMany(ThreadMessage::class, 'thread_id', 'id')->get();
     }
+
+    public function lastMessage()
+    {
+        return ThreadMessage::query()
+            ->where('thread_id', $this->id)
+            ->orderBy('created_at', 'DESC')
+            ->first() ?? '';
+    }
+
+    public function participants()
+    {
+        return $this->hasMany(ThreadParticipant::class);
+    }
 }

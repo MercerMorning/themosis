@@ -8,11 +8,11 @@ class AuthUser
 {
     public static function currentUser()
     {
-        User::find(wp_get_current_user()->ID);
+        return User::find(wp_get_current_user()->ID);
     }
 
     public static function currentUserId()
     {
-        User::find(wp_get_current_user()->ID)->ID;
+        return User::find(wp_get_current_user()->ID)->ID;
     }
 }

@@ -12,13 +12,13 @@
 //    [\Theme\Controllers\ThreadController::class,
 //        'add'])->name('add_thread');
 //
-//Route::get('chat/get_threads/',
-//    [\Theme\Controllers\ThreadController::class,
-//        'getAll'])->name('get_threads');
-//
-//Route::get('chat/get_thread/',
-//    [\Theme\Controllers\ThreadController::class,
-//        'getThreadMessages'])->name('get_thread');
+Route::get('chat/get_threads/',
+    [\Theme\Controllers\MessagesController::class,
+        'getAll'])->name('get_threads');
+
+Route::get('chat/get_thread/',
+    [\Theme\Controllers\MessagesController::class,
+        'showThread'])->name('get_thread');
 //
 //Route::post('chat/send_message_to_user/',
 //    [\Theme\Controllers\PersonalCorrespondence::class,
@@ -33,5 +33,5 @@
 //        'inviteParticipant'])->name('invite_participant');
 //
 Route::any('page',
-    [\Theme\Controllers\PageController::class,
-        'index']);
+    [\Theme\Controllers\MessagesController::class,
+        'showChat']);
