@@ -10,6 +10,7 @@
         </a>
       </div>
       <ul class="menu-threads__list">
+
         <li v-for="thread in threadsData"
             v-on:click="showThread"
             v-bind:data-id="thread.id"
@@ -78,7 +79,7 @@
             <svg width="20" height="18">
               <use xlink:href="/content/themes/myinvision/assets//images/sprite.svg#icon-clip"></use>
             </svg>
-            <input type="file" name="file">
+            <input type="file" name="file" v-on:change="sendImage">
           </label>
           <label class="chat-footer__input-text">
             <textarea class="input-message" type="text" name="body" placeholder="Введите сообщение"></textarea>
@@ -132,7 +133,7 @@ export default {
         socket : new WebSocket("ws://localhost:8999"),
         threadsData: JSON.parse(this.threads),
         currentUserData: JSON.parse(this.currentuser),
-        currentThread: JSON.parse(this.currentthread) ?? null,
+        currentThread: JSON.parse(this.currentthread) ?? { id: 0 },
         threadMessages: JSON.parse(this.threadmessages) ?? null,
         userToken: JSON.parse(this.usertoken) ?? null
       }
@@ -149,27 +150,37 @@ export default {
       })
     },
     sendMessage: function (event) {
-      let formData = new FormData(event.target);
+      if (this.currentThread.id !== 0) {
+        let formData = new FormData(event.target);
         this.socket.send(JSON.stringify({
           user_id: this.currentUserData.id,
           thread_id: formData.get('threadId'),
           body: formData.get('body'),
           token: this.userToken,
         }));
-      document.querySelector('.chat-footer').reset();
-
-      // }
-
-      // axios.post('/chat/send_message_to_thread/',  {
-      //   'body' : formData.get('body'),
-      //   'thread_id' : formData.get('threadId'),
-      //   // 'file' : 'sdf'
-      // }).then(response => {
-      //   document.querySelector('.chat-footer').reset();
-      //   this.threadMessages = response.data
-      // })
-
+        document.querySelector('.chat-footer').reset();
+      }
     },
+    sendImage: function()
+    {
+      // let formData = new FormData(document.querySelector('.chat-footer'));
+      // if (formData.get('file').size !== 0) {
+      //   var reader = new FileReader();
+      //   reader.readAsDataURL(formData.get('file'));
+      //   reader.onload = function () {
+      //     console.log(reader.result);
+      //     axios.post('/chat/send_message_to_thread/', {
+      //       'image': reader.result,
+      //       'thread_id': formData.get('threadId'),
+      //       // 'file' : 'sdf'
+      //     }).then(response => {
+      //       // console.log(response.data)
+      //       // this.threadMessages = response.data
+      //     })
+      //   }
+      // }
+      // document.querySelector('.chat-footer').reset()
+    }
   }
 
 }

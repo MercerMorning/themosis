@@ -2059,6 +2059,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   mounted: function mounted() {
     var _this = this;
@@ -2089,7 +2090,9 @@ __webpack_require__.r(__webpack_exports__);
         socket: new WebSocket("ws://localhost:8999"),
         threadsData: JSON.parse(this.threads),
         currentUserData: JSON.parse(this.currentuser),
-        currentThread: (_JSON$parse = JSON.parse(this.currentthread)) !== null && _JSON$parse !== void 0 ? _JSON$parse : null,
+        currentThread: (_JSON$parse = JSON.parse(this.currentthread)) !== null && _JSON$parse !== void 0 ? _JSON$parse : {
+          id: 0
+        },
         threadMessages: (_JSON$parse2 = JSON.parse(this.threadmessages)) !== null && _JSON$parse2 !== void 0 ? _JSON$parse2 : null,
         userToken: (_JSON$parse3 = JSON.parse(this.usertoken)) !== null && _JSON$parse3 !== void 0 ? _JSON$parse3 : null
       };
@@ -2108,22 +2111,34 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     sendMessage: function sendMessage(event) {
-      var formData = new FormData(event.target);
-      this.socket.send(JSON.stringify({
-        user_id: this.currentUserData.id,
-        thread_id: formData.get('threadId'),
-        body: formData.get('body'),
-        token: this.userToken
-      }));
-      document.querySelector('.chat-footer').reset(); // }
-      // axios.post('/chat/send_message_to_thread/',  {
-      //   'body' : formData.get('body'),
-      //   'thread_id' : formData.get('threadId'),
-      //   // 'file' : 'sdf'
-      // }).then(response => {
-      //   document.querySelector('.chat-footer').reset();
-      //   this.threadMessages = response.data
-      // })
+      if (this.currentThread.id !== 0) {
+        var formData = new FormData(event.target);
+        this.socket.send(JSON.stringify({
+          user_id: this.currentUserData.id,
+          thread_id: formData.get('threadId'),
+          body: formData.get('body'),
+          token: this.userToken
+        }));
+        document.querySelector('.chat-footer').reset();
+      }
+    },
+    sendImage: function sendImage() {// let formData = new FormData(document.querySelector('.chat-footer'));
+      // if (formData.get('file').size !== 0) {
+      //   var reader = new FileReader();
+      //   reader.readAsDataURL(formData.get('file'));
+      //   reader.onload = function () {
+      //     console.log(reader.result);
+      //     axios.post('/chat/send_message_to_thread/', {
+      //       'image': reader.result,
+      //       'thread_id': formData.get('threadId'),
+      //       // 'file' : 'sdf'
+      //     }).then(response => {
+      //       // console.log(response.data)
+      //       // this.threadMessages = response.data
+      //     })
+      //   }
+      // }
+      // document.querySelector('.chat-footer').reset()
     }
   }
 });
@@ -14350,7 +14365,10 @@ var render = function() {
                 })
               ]),
               _vm._v(" "),
-              _c("input", { attrs: { type: "file", name: "file" } })
+              _c("input", {
+                attrs: { type: "file", name: "file" },
+                on: { change: _vm.sendImage }
+              })
             ]),
             _vm._v(" "),
             _vm._m(0),
