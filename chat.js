@@ -13,14 +13,12 @@ const webSocketServer = new WebSocket.Server({ server });
 webSocketServer.on('connection', ws => {
     ws.on('message', message => {
         let parsedMessage = JSON.parse(message);
-        let result;
         axios.post(domen + '/chat/send_message_to_thread/',  {
             'body' : parsedMessage.body,
             'thread_id' : parsedMessage.thread_id,
-            // 'body' : 'sdfs',
-            // 'thread_id' : 17,
             'user_id' : parsedMessage.user_id,
             'token' : parsedMessage.token,
+            'file' : parsedMessage.file ? parsedMessage.file : null,
         }).then(response => {
             webSocketServer.clients.forEach(client => {
                 client.send(JSON.stringify(response.data));

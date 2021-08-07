@@ -61,8 +61,9 @@
               <div class="chat-message__user-messages">
                 <div v-for="message in groupMessage.messages" class="chat-message__message_message-body">
                   <div class="chat-message__text">
-<!--                    <img class="message_image" v-if="message.is_file" v-bind:src="message.body">-->
-                    <span>{{ message.body }}</span>
+                    <img class="message_image" v-if="message.isFile" v-bind:src="message.body">
+                    <span v-else>{{ message.body }}</span>
+
                   </div>
                   <div class="chat-message__time">{{ message.created_at }}</div>
                 </div>
@@ -163,23 +164,22 @@ export default {
     },
     sendImage: function()
     {
-      // let formData = new FormData(document.querySelector('.chat-footer'));
-      // if (formData.get('file').size !== 0) {
-      //   var reader = new FileReader();
-      //   reader.readAsDataURL(formData.get('file'));
-      //   reader.onload = function () {
-      //     console.log(reader.result);
-      //     axios.post('/chat/send_message_to_thread/', {
-      //       'image': reader.result,
-      //       'thread_id': formData.get('threadId'),
-      //       // 'file' : 'sdf'
-      //     }).then(response => {
-      //       // console.log(response.data)
-      //       // this.threadMessages = response.data
-      //     })
-      //   }
-      // }
-      // document.querySelector('.chat-footer').reset()
+      let formData = new FormData(document.querySelector('.chat-footer'));
+      if (formData.get('file').size !== 0) {
+        var reader = new FileReader();
+        reader.readAsDataURL(formData.get('file'));
+        reader.onload = () => {
+          this.socket.send(JSON.stringify({
+            user_id: this.currentUserData.id,
+            thread_id: formData.get('threadId'),
+            file: reader.result,
+            token: this.userToken,
+            body: ' '
+          }));
+          document.querySelector('.chat-footer').reset();
+        }
+      }
+      document.querySelector('.chat-footer').reset()
     }
   }
 

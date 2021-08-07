@@ -2060,6 +2060,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   mounted: function mounted() {
     var _this = this;
@@ -2122,23 +2123,29 @@ __webpack_require__.r(__webpack_exports__);
         document.querySelector('.chat-footer').reset();
       }
     },
-    sendImage: function sendImage() {// let formData = new FormData(document.querySelector('.chat-footer'));
-      // if (formData.get('file').size !== 0) {
-      //   var reader = new FileReader();
-      //   reader.readAsDataURL(formData.get('file'));
-      //   reader.onload = function () {
-      //     console.log(reader.result);
-      //     axios.post('/chat/send_message_to_thread/', {
-      //       'image': reader.result,
-      //       'thread_id': formData.get('threadId'),
-      //       // 'file' : 'sdf'
-      //     }).then(response => {
-      //       // console.log(response.data)
-      //       // this.threadMessages = response.data
-      //     })
-      //   }
-      // }
-      // document.querySelector('.chat-footer').reset()
+    sendImage: function sendImage() {
+      var _this3 = this;
+
+      var formData = new FormData(document.querySelector('.chat-footer'));
+
+      if (formData.get('file').size !== 0) {
+        var reader = new FileReader();
+        reader.readAsDataURL(formData.get('file'));
+
+        reader.onload = function () {
+          _this3.socket.send(JSON.stringify({
+            user_id: _this3.currentUserData.id,
+            thread_id: formData.get('threadId'),
+            file: reader.result,
+            token: _this3.userToken,
+            body: ' '
+          }));
+
+          document.querySelector('.chat-footer').reset();
+        };
+      }
+
+      document.querySelector('.chat-footer').reset();
     }
   }
 });
@@ -14312,7 +14319,16 @@ var render = function() {
                                 _c(
                                   "div",
                                   { staticClass: "chat-message__text" },
-                                  [_c("span", [_vm._v(_vm._s(message.body))])]
+                                  [
+                                    message.isFile
+                                      ? _c("img", {
+                                          staticClass: "message_image",
+                                          attrs: { src: message.body }
+                                        })
+                                      : _c("span", [
+                                          _vm._v(_vm._s(message.body))
+                                        ])
+                                  ]
                                 ),
                                 _vm._v(" "),
                                 _c(

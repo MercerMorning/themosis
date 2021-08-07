@@ -3,11 +3,13 @@
 namespace Theme\Controllers;
 
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Helper\Helper;
 use Theme\Helpers\AuthUser;
+use Theme\Models\Attachment;
 use Theme\Models\User;
 use Carbon\Carbon;
-use Cmgmyr\Messenger\Models\Message;
+use Theme\Models\Message;
 use Cmgmyr\Messenger\Models\Participant;
 use Theme\Models\Thread;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -54,9 +56,9 @@ class MessagesController extends Controller
                 ->get()
                 ->last();
             $thread->lastMessage =
-                UserPrepareService::threadPresenterLastMessage(
+                $lastMessageData ? UserPrepareService::threadPresenterLastMessage(
                     $lastMessageData->user_id, $lastMessageData->body
-                );
+                ) : '';
             $thread->datetime = Carbon::parse($thread->updated_at)->format('d/m/Y');
             return $thread;
         });
@@ -94,7 +96,19 @@ class MessagesController extends Controller
             })
             ->groupBy('date')
             ->map(function ($message) {
-                $messages = $message->toArray();
+                $messages = Message::query()
+                    ->whereIn('id', $message->pluck('id'))
+                    ->with('attachment')
+                    ->get()
+                    ->map(function ($message) {
+                        if ($message->attachment) {
+                            $message->body = file_get_contents($message->attachment->path);
+                            $message->isFile = true;
+
+                        }
+                        return $message;
+                    })
+                    ->toArray();
                 $formatedMessages = [];
                 $messagesGroupKey = 0;
                 $lastMessage = null;
@@ -189,11 +203,25 @@ class MessagesController extends Controller
             return response('', 400);
         }
 
+        $messageBody =  $request->get('body');
+
+        if ($request->get('file')) {
+            $messageBody = ' ';
+        }
+
         $message = Message::create([
             'thread_id' => $request->get('thread_id'),
             'user_id' => $request->get('user_id'),
-            'body' => $request->get('body'),
+            'body' => $messageBody,
         ]);
+
+        if ($request->get('file')) {
+                $fileName = "file_" . Str::uuid();
+                file_put_contents(get_template_directory() . '/storage/' . $fileName, $request->get('image'));
+                Attachment::create([
+                    'message_id' => $message->id,
+                    'path' => get_template_directory_uri() . '/storage/' . $fileName]);
+        }
 
 //        return $this->showThread(new Request(['user_id' => $request->get('user_id'),'id' => $request->get('thread_id')]))['threadMessages'];
         return $this->showThread(new Request(['user_id' => $request->get('user_id'),'id' => $request->get('thread_id')]));
