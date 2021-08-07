@@ -24,7 +24,16 @@ class MessagesController extends Controller
         global $post;
         $threads = $this->getAllThreads();
         $currentUserData = UserPrepareService::currentUserPresenter();
+        $threadMessages = null;
+        $currentThread = null;
+        if (isset($_COOKIE['currentThreadId'])) {
+            $threadInfo = $this->showThread(new Request(['id' => $_COOKIE['currentThreadId']]));
+            $threadMessages = $threadInfo['threadMessages'];
+            $currentThread = $threadInfo['currentThread'];
+        }
         $chat = view('front.chat', [
+            'currentThread' => json_encode($currentThread),
+            'threadMessages' => json_encode($threadMessages),
             'currentUser' => json_encode($currentUserData),
             'threads' => json_encode($threads),
         ])->render();

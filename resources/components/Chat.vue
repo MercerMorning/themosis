@@ -117,14 +117,16 @@ export default {
   props: {
     threads: String,
     currentuser: String,
+    currentthread: String,
+    threadmessages: String,
   },
   data: function () {
     {
       return {
         threadsData: JSON.parse(this.threads),
         currentUserData: JSON.parse(this.currentuser),
-        currentThread: this.currentThread ?? null,
-        threadMessages: null
+        currentThread: JSON.parse(this.currentthread) ?? null,
+        threadMessages: JSON.parse(this.threadmessages) ?? null
       }
     }
   },
@@ -132,6 +134,7 @@ export default {
     showThread : function (e) {
       let idItem = event.target.closest('.menu-threads__item');
       axios.get('/chat/get_thread?id=' +  idItem.dataset.id).then( response => {
+        document.cookie = "currentThreadId=" + response.data.currentThread.id;
         this.threadsData = response.data.threads
         this.currentThread = response.data.currentThread;
         this.threadMessages = response.data.threadMessages;

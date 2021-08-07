@@ -2072,17 +2072,19 @@ __webpack_require__.r(__webpack_exports__);
   },
   props: {
     threads: String,
-    currentuser: String
+    currentuser: String,
+    currentthread: String,
+    threadmessages: String
   },
   data: function data() {
     {
-      var _this$currentThread;
+      var _JSON$parse, _JSON$parse2;
 
       return {
         threadsData: JSON.parse(this.threads),
         currentUserData: JSON.parse(this.currentuser),
-        currentThread: (_this$currentThread = this.currentThread) !== null && _this$currentThread !== void 0 ? _this$currentThread : null,
-        threadMessages: null
+        currentThread: (_JSON$parse = JSON.parse(this.currentthread)) !== null && _JSON$parse !== void 0 ? _JSON$parse : null,
+        threadMessages: (_JSON$parse2 = JSON.parse(this.threadmessages)) !== null && _JSON$parse2 !== void 0 ? _JSON$parse2 : null
       };
     }
   },
@@ -2092,6 +2094,7 @@ __webpack_require__.r(__webpack_exports__);
 
       var idItem = event.target.closest('.menu-threads__item');
       axios.get('/chat/get_thread?id=' + idItem.dataset.id).then(function (response) {
+        document.cookie = "currentThreadId=" + response.data.currentThread.id;
         _this.threadsData = response.data.threads;
         _this.currentThread = response.data.currentThread;
         _this.threadMessages = response.data.threadMessages;
