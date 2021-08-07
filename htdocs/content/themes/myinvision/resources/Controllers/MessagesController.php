@@ -217,7 +217,7 @@ class MessagesController extends Controller
 
         if ($request->get('file')) {
                 $fileName = "file_" . Str::uuid();
-                file_put_contents(get_template_directory() . '/storage/' . $fileName, $request->get('image'));
+                file_put_contents(get_template_directory() . '/storage/' . $fileName, $request->get('file'));
                 Attachment::create([
                     'message_id' => $message->id,
                     'path' => get_template_directory_uri() . '/storage/' . $fileName]);
