@@ -40,51 +40,36 @@
         <img class="" src="/content/themes/myinvision/assets/images/person.png">
       </div>
       <div class="chat-body">
-        <div class="chat-message__date">
-                <span>
-                    17.06.2021
-                </span>
-        </div>
-        <div class="chat-message__message chat-message__message_foreign-user">
-          <span class="chat-message__autor">Phillip Torff</span>
-          <div class="chat-message__message_message-content">
-            <img class="thread-link__participant_ava" src="/content/themes/myinvision/assets/images/person.png">
-            <div class="chat-message__user-messages">
-              <div class="chat-message__message_message-body">
-                <div class="chat-message__text">
-                  Хай
-                </div>
-                <div class="chat-message__time">11:53</div>
-              </div>
-              <div class="chat-message__message_message-body">
-                <div class="chat-message__text">
-                  Хай
-                </div>
-                <div class="chat-message__time">11:53</div>
-              </div>
-            </div>
 
+        <label v-for="(groupMessages, date) in threadMessages">
+          <div class="chat-message__date">
+                <span>
+                    {{ date }}
+                </span>
           </div>
-        </div>
-        <div class="chat-message__message chat-message__message_current-user">
-          <div class="chat-message__message_message-content">
-            <div class="chat-message__user-messages">
-              <div class="chat-message__message_message-body">
-                <div class="chat-message__text">
-                  Хай
+          <div v-for="groupMessage in groupMessages"
+               v-bind:class="[groupMessage.user_info.user_id === currentUserData.id
+               ? 'chat-message__message chat-message__message_current-user'
+               : 'chat-message__message chat-message__message_foreign-user']">
+            <span v-if="groupMessage.user_info.user_id !== currentUserData.id" class="chat-message__autor">
+              {{ groupMessage.user_info.first_name + ' ' + groupMessage.user_info.last_name }}
+            </span>
+            <div class="chat-message__message_message-content">
+              <img class="thread-link__participant_ava"
+                   v-bind:src="groupMessage.user_info.ava">
+              <div class="chat-message__user-messages">
+                <div v-for="message in groupMessage.messages" class="chat-message__message_message-body">
+                  <div class="chat-message__text">
+<!--                    <img class="message_image" v-if="message.is_file" v-bind:src="message.body">-->
+                    <span>{{ message.body }}</span>
+                  </div>
+                  <div class="chat-message__time">{{ message.created_at }}</div>
                 </div>
-                <div class="chat-message__time">11:53</div>
               </div>
-              <div class="chat-message__message_message-body">
-                <div class="chat-message__text">
-                  Хай
-                </div>
-                <div class="chat-message__time">11:53</div>
-              </div>
+
             </div>
-            <img class="thread-link__participant_ava" src="/content/themes/myinvision/assets/images/person.png">
           </div>
-        </div>
+        </label>
       </div>
       <form class="chat-footer">
         <div class="chat-footer__input-wrpa">
@@ -139,6 +124,7 @@ export default {
         threadsData: JSON.parse(this.threads),
         currentUserData: JSON.parse(this.currentuser),
         currentThread: this.currentThread ?? null,
+        threadMessages: null
       }
     }
   },
@@ -146,8 +132,9 @@ export default {
     showThread : function (e) {
       let idItem = event.target.closest('.menu-threads__item');
       axios.get('/chat/get_thread?id=' +  idItem.dataset.id).then( response => {
-        this.threadMessages = response.data
-        this.currentThread = idItem.id;
+        this.threadsData = response.data.threads
+        this.currentThread = response.data.currentThread;
+        this.threadMessages = response.data.threadMessages;
       })
     }
 

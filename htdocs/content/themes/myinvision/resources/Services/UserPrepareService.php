@@ -13,6 +13,7 @@ class UserPrepareService
     static public function  threadPresenterData($userId)
     {
         $userData = [
+            'id' => $userId,
             'first_name' => get_user_meta( $userId, 'first_name', true ),
             'last_name' => get_user_meta( $userId, 'last_name', true ),
             'ava' => get_user_meta( $userId, 'avatar', true ) == '^ ""'

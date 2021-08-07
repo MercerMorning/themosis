@@ -20,22 +20,9 @@ class MessagesController extends Controller
 {
     public function showChat()
     {
+//        dd($this->showThread(new Request(['id' => 17])));
         global $post;
-
         $threads = $this->getAllThreads();
-        $threads->map(function ($thread) {
-            $lastMessageData = $thread
-                ->messages()
-                ->get()
-                ->last();
-            $thread->lastMessage =
-                UserPrepareService::threadPresenterLastMessage(
-                    $lastMessageData->user_id, $lastMessageData->body
-                );
-            $thread->datetime = Carbon::parse($thread->updated_at)->format('d/m/Y');
-            return $thread;
-        });
-        $threads = $threads->sortBy('updated_at');
         $currentUserData = UserPrepareService::currentUserPresenter();
         $chat = view('front.chat', [
             'currentUser' => json_encode($currentUserData),
@@ -49,6 +36,19 @@ class MessagesController extends Controller
         $threads =  Thread::forUser(AuthUser::currentUserId())
             ->latest('updated_at')
             ->get();;
+        $threads->map(function ($thread) {
+            $lastMessageData = $thread
+                ->messages()
+                ->get()
+                ->last();
+            $thread->lastMessage =
+                UserPrepareService::threadPresenterLastMessage(
+                    $lastMessageData->user_id, $lastMessageData->body
+                );
+            $thread->datetime = Carbon::parse($thread->updated_at)->format('d/m/Y');
+            return $thread;
+        });
+        $threads = $threads->sortBy('updated_at');
         return $threads;
     }
     /**
@@ -72,11 +72,41 @@ class MessagesController extends Controller
 
         $thread->markAsRead($userId);
 
-        $query = $thread->messages()
+        $messages = $thread->messages()
 //            ->with('user')
-            ->latest();
-
-        $messages = $query->get();
+            ->latest()
+            ->get()
+            ->map(function ($message) {
+                $message->date = $message->created_at->format('d.m.Y');
+                return $message;
+            })
+            ->groupBy('date')
+            ->map(function ($message) {
+                $messages = $message->toArray();
+                $formatedMessages = [];
+                $messagesGroupKey = 0;
+                $lastMessage = null;
+                for ($i = 0; $i < count($messages); $i++) {
+                    if ($i == 0) {
+                        $lastMessage = $formatedMessages[$messagesGroupKey][] = $messages[$i];
+                    } else {
+                        if ($lastMessage['user_id'] !=  $messages[$i]['user_id']) {
+                            $messagesGroupKey++;
+                        }
+                        $lastMessage = $formatedMessages[$messagesGroupKey][] = $messages[$i];
+                    }
+                }
+                $formatedMessages = collect($formatedMessages)->map(function ($userMessages) {
+                    return [
+                        'messages' => $userMessages,
+                        'user_info' =>
+                        UserPrepareService::threadPresenterData(
+                            $userMessages[0]['user_id']
+                        )
+                    ];
+                });
+                return $formatedMessages;
+            });
 //        $messages->load('user:id,surname,first_name,middle_name');
         return [
             'threads' => $threads,

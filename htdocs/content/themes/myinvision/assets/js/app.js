@@ -2058,21 +2058,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   mounted: function mounted() {
     var socket = new WebSocket("ws://localhost:8999");
@@ -2096,7 +2081,8 @@ __webpack_require__.r(__webpack_exports__);
       return {
         threadsData: JSON.parse(this.threads),
         currentUserData: JSON.parse(this.currentuser),
-        currentThread: (_this$currentThread = this.currentThread) !== null && _this$currentThread !== void 0 ? _this$currentThread : null
+        currentThread: (_this$currentThread = this.currentThread) !== null && _this$currentThread !== void 0 ? _this$currentThread : null,
+        threadMessages: null
       };
     }
   },
@@ -2106,8 +2092,9 @@ __webpack_require__.r(__webpack_exports__);
 
       var idItem = event.target.closest('.menu-threads__item');
       axios.get('/chat/get_thread?id=' + idItem.dataset.id).then(function (response) {
-        _this.threadMessages = response.data;
-        _this.currentThread = idItem.id;
+        _this.threadsData = response.data.threads;
+        _this.currentThread = response.data.currentThread;
+        _this.threadMessages = response.data.threadMessages;
       });
     } //   getThreads: function () {
     //     return fetch('/')
@@ -14360,7 +14347,95 @@ var render = function() {
         })
       ]),
       _vm._v(" "),
-      _vm._m(0),
+      _c(
+        "div",
+        { staticClass: "chat-body" },
+        _vm._l(_vm.threadMessages, function(groupMessages, date) {
+          return _c(
+            "label",
+            [
+              _c("div", { staticClass: "chat-message__date" }, [
+                _c("span", [
+                  _vm._v(
+                    "\n                    " +
+                      _vm._s(date) +
+                      "\n                "
+                  )
+                ])
+              ]),
+              _vm._v(" "),
+              _vm._l(groupMessages, function(groupMessage) {
+                return _c(
+                  "div",
+                  {
+                    class: [
+                      groupMessage.user_info.user_id === _vm.currentUserData.id
+                        ? "chat-message__message chat-message__message_current-user"
+                        : "chat-message__message chat-message__message_foreign-user"
+                    ]
+                  },
+                  [
+                    groupMessage.user_info.user_id !== _vm.currentUserData.id
+                      ? _c("span", { staticClass: "chat-message__autor" }, [
+                          _vm._v(
+                            "\n              " +
+                              _vm._s(
+                                groupMessage.user_info.first_name +
+                                  " " +
+                                  groupMessage.user_info.last_name
+                              ) +
+                              "\n            "
+                          )
+                        ])
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _c(
+                      "div",
+                      { staticClass: "chat-message__message_message-content" },
+                      [
+                        _c("img", {
+                          staticClass: "thread-link__participant_ava",
+                          attrs: { src: groupMessage.user_info.ava }
+                        }),
+                        _vm._v(" "),
+                        _c(
+                          "div",
+                          { staticClass: "chat-message__user-messages" },
+                          _vm._l(groupMessage.messages, function(message) {
+                            return _c(
+                              "div",
+                              {
+                                staticClass:
+                                  "chat-message__message_message-body"
+                              },
+                              [
+                                _c(
+                                  "div",
+                                  { staticClass: "chat-message__text" },
+                                  [_c("span", [_vm._v(_vm._s(message.body))])]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "div",
+                                  { staticClass: "chat-message__time" },
+                                  [_vm._v(_vm._s(message.created_at))]
+                                )
+                              ]
+                            )
+                          }),
+                          0
+                        )
+                      ]
+                    )
+                  ]
+                )
+              })
+            ],
+            2
+          )
+        }),
+        0
+      ),
       _vm._v(" "),
       _c("form", { staticClass: "chat-footer" }, [
         _c("div", { staticClass: "chat-footer__input-wrpa" }, [
@@ -14377,10 +14452,10 @@ var render = function() {
             _c("input", { attrs: { type: "file", name: "file" } })
           ]),
           _vm._v(" "),
-          _vm._m(1),
+          _vm._m(0),
           _vm._v(" "),
           _c("label", { staticClass: "chat-footer__send-message" }, [
-            _vm._m(2),
+            _vm._m(1),
             _vm._v(" "),
             _c("svg", { attrs: { width: "20", height: "18" } }, [
               _c("use", {
@@ -14397,102 +14472,6 @@ var render = function() {
   ])
 }
 var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "chat-body" }, [
-      _c("div", { staticClass: "chat-message__date" }, [
-        _c("span", [
-          _vm._v("\n                    17.06.2021\n                ")
-        ])
-      ]),
-      _vm._v(" "),
-      _c(
-        "div",
-        {
-          staticClass:
-            "chat-message__message chat-message__message_foreign-user"
-        },
-        [
-          _c("span", { staticClass: "chat-message__autor" }, [
-            _vm._v("Phillip Torff")
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "chat-message__message_message-content" }, [
-            _c("img", {
-              staticClass: "thread-link__participant_ava",
-              attrs: {
-                src: "/content/themes/myinvision/assets/images/person.png"
-              }
-            }),
-            _vm._v(" "),
-            _c("div", { staticClass: "chat-message__user-messages" }, [
-              _c("div", { staticClass: "chat-message__message_message-body" }, [
-                _c("div", { staticClass: "chat-message__text" }, [
-                  _vm._v("\n                  Хай\n                ")
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "chat-message__time" }, [
-                  _vm._v("11:53")
-                ])
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "chat-message__message_message-body" }, [
-                _c("div", { staticClass: "chat-message__text" }, [
-                  _vm._v("\n                  Хай\n                ")
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "chat-message__time" }, [
-                  _vm._v("11:53")
-                ])
-              ])
-            ])
-          ])
-        ]
-      ),
-      _vm._v(" "),
-      _c(
-        "div",
-        {
-          staticClass:
-            "chat-message__message chat-message__message_current-user"
-        },
-        [
-          _c("div", { staticClass: "chat-message__message_message-content" }, [
-            _c("div", { staticClass: "chat-message__user-messages" }, [
-              _c("div", { staticClass: "chat-message__message_message-body" }, [
-                _c("div", { staticClass: "chat-message__text" }, [
-                  _vm._v("\n                  Хай\n                ")
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "chat-message__time" }, [
-                  _vm._v("11:53")
-                ])
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "chat-message__message_message-body" }, [
-                _c("div", { staticClass: "chat-message__text" }, [
-                  _vm._v("\n                  Хай\n                ")
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "chat-message__time" }, [
-                  _vm._v("11:53")
-                ])
-              ])
-            ]),
-            _vm._v(" "),
-            _c("img", {
-              staticClass: "thread-link__participant_ava",
-              attrs: {
-                src: "/content/themes/myinvision/assets/images/person.png"
-              }
-            })
-          ])
-        ]
-      )
-    ])
-  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
