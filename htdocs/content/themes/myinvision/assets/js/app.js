@@ -2122,6 +2122,10 @@ __webpack_require__.r(__webpack_exports__);
         }));
         document.querySelector('.chat-footer').reset();
       }
+
+      jQuery(".chat-body").animate({
+        scrollBottom: jQuery(document).height()
+      }, "slow");
     },
     sendImage: function sendImage() {
       var _this3 = this;

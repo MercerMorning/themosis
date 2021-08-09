@@ -161,7 +161,7 @@ export default {
         }));
         document.querySelector('.chat-footer').reset();
       }
-
+      jQuery(".chat-body").animate({ scrollBottom: jQuery(document).height() }, "slow");
     },
     sendImage: function()
     {
