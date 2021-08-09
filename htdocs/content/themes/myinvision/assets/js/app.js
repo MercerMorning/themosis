@@ -14259,7 +14259,7 @@ var render = function() {
         { staticClass: "chat-body" },
         _vm._l(_vm.threadMessages, function(groupMessages, date) {
           return _c(
-            "label",
+            "div",
             [
               _c("div", { staticClass: "chat-message__date" }, [
                 _c("span", [
@@ -26712,7 +26712,7 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 Vue.component('chat-component', _components_Chat_vue__WEBPACK_IMPORTED_MODULE_1__["default"]);
 var app = new Vue({
-  el: '#app'
+  el: '#chat-app'
 });
 
 /***/ }),
@@ -26724,7 +26724,7 @@ var app = new Vue({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\OpenServer\domains\myinvision_t\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\OpenServer\domains\themosis\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })

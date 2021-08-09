@@ -1,6 +1,6 @@
 @extends('layouts.main')
 @section('main_content')
-        <div id="app">
+        <div id="chat-app" class="chat-wrapper">
                 <chat-component
                         usertoken="{{ $userToken }}"
                         currentuser="{{ $currentUser }}"

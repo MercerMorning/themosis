@@ -42,7 +42,7 @@
       </div>
       <div class="chat-body">
 
-        <label v-for="(groupMessages, date) in threadMessages">
+        <div v-for="(groupMessages, date) in threadMessages">
           <div class="chat-message__date">
                 <span>
                     {{ date }}
@@ -71,7 +71,7 @@
 
             </div>
           </div>
-        </label>
+        </div>
       </div>
       <form class="chat-footer" v-on:submit.prevent="sendMessage">
         <input type="hidden" name="threadId" v-bind:value="currentThread.id">
@@ -161,6 +161,7 @@ export default {
         }));
         document.querySelector('.chat-footer').reset();
       }
+
     },
     sendImage: function()
     {
