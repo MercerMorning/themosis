@@ -10,6 +10,7 @@ use Theme\Helpers\AuthUser;
 
 class Thread extends \Cmgmyr\Messenger\Models\Thread
 {
+    protected $fillable = ['is_private', 'subject'];
     public function messages()
     {
         return $this->hasMany(Models::classname(\Theme\Models\Message::class), 'thread_id', 'id');

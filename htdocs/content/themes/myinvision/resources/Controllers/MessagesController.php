@@ -2,6 +2,7 @@
 
 namespace Theme\Controllers;
 
+use Carbon\Traits\Creator;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Helper\Helper;
@@ -166,6 +167,37 @@ class MessagesController extends Controller
 
         if ($request->has('recipients')) {
             $thread->addParticipant($input['recipients']);
+        }
+
+        $query = $thread->messages()
+            ->with('user')
+            ->latest();
+
+
+        $messages = $query->get();
+
+        $threads =  Thread::forUser(AuthUser::currentUserId())
+            ->latest('updated_at')
+            ->get();;
+        return response(['threads' => $threads]);
+    }
+
+    public function storePrivate(Request $request)
+    {
+        $input = $request->all();
+        $thread = Thread::create([
+            'subject' => '',
+            'is_private' => 1,
+        ]);
+
+        Participant::create([
+            'thread_id' => $thread->id,
+            'user_id' => AuthUser::currentUserId(),
+            'last_read' => new Carbon,
+        ]);
+
+        if ($request->has('recipient')) {
+            $thread->addParticipant($input['recipient']);
         }
 
         $query = $thread->messages()

@@ -8,7 +8,7 @@ class Thread extends Model
 {
     protected $table = 'threads';
 
-    protected $fillable = ['subject', 'private'];
+    protected $fillable = ['subject', 'private', 'is_private'];
 
     protected $casts = [
         'created_at' => 'datetime:d.m.Y H:i',

@@ -10,49 +10,64 @@
         </a>
       </div>
 <!--      <ul class="menu-threads__list" v-if="addingChat === 'group'">-->
+<!--        <form v-on:submit.prevent="createGroupThread">-->
+<!--          <span class="creat-group_thread__title">Создание группового чата</span>-->
+<!--          <div class="create-group_thread__input-input_container">-->
+<!--            <svg width="75" height="75">-->
+<!--              <use xlink:href="/content/themes/myinvision/assets/images/open_adding_group_thread_modal.svg#add_group"></use>-->
+<!--            </svg>-->
+<!--            <div class="create_group_chat">-->
+<!--              <label class="create_group-thread__input-text">-->
+<!--                <input class="input-message" type="text" name="thread_name" placeholder="Название группы">-->
+<!--              </label>-->
+
+<!--              <label class="chat-footer__send-message">-->
+<!--                <button class="button chat-footer__button" type="submit">-->
+<!--                            <span class="send-button_text">-->
+<!--                                Создать-->
+<!--                            </span>-->
+<!--                </button>-->
+<!--              </label>-->
+<!--            </div>-->
+<!--          </div>-->
+
+<!--          <ul>-->
+<!--            <li class="menu-threads__item" v-for="user in usersData" v-on:click="addParticipant" v-bind:data-id="user.id">-->
+<!--              <a class="menu-threads__link">-->
+<!--                <img class="thread-link__participant_ava" v-bind:src="user.ava">-->
+<!--                <div class="thread-link__dialog">-->
+<!--                  <div class="thread-link__content">-->
+<!--                          <span class="thread-participant_name">-->
+<!--                            {{ user.first_name + ' ' + user.last_name }}-->
+<!--                          </span>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--                <svg class="add_to_thread" width="25" height="25">-->
+<!--                  <use xlink:href="/content/themes/myinvision/assets/images/add.svg#add"></use>-->
+<!--                </svg>-->
+<!--              </a>-->
+<!--            </li>-->
+<!--          </ul>-->
+<!--        </form>-->
+<!--      </ul>-->
+<!--      <ul v-else-if="addingChat === 'private'">-->
       <ul class="menu-threads__list">
-        <form v-on:submit.prevent="createGroupThread">
-          <span class="creat-group_thread__title">Создание группового чата</span>
-          <div class="create-group_thread__input-input_container">
-            <svg width="75" height="75">
-              <use xlink:href="/content/themes/myinvision/assets/images/open_adding_group_thread_modal.svg#add_group"></use>
-            </svg>
-            <div class="create_group_chat">
-              <label class="create_group-thread__input-text">
-                <input class="input-message" type="text" name="thread_name" placeholder="Название группы">
-              </label>
-
-              <label class="chat-footer__send-message">
-                <button class="button chat-footer__button" type="submit">
-                            <span class="send-button_text">
-                                Создать
-                            </span>
-                </button>
-              </label>
-            </div>
-          </div>
-
-          <ul>
-            <li class="menu-threads__item" v-for="user in usersData" v-on:click="addParticipant" v-bind:data-id="user.id">
-              <a class="menu-threads__link">
-                <img class="thread-link__participant_ava" v-bind:src="user.ava">
-                <div class="thread-link__dialog">
-                  <div class="thread-link__content">
+        <li class="menu-threads__item" v-for="user in usersData" v-on:click="openOrCreatePrivateThread" v-bind:data-id="user.id">
+          <a class="menu-threads__link">
+            <img class="thread-link__participant_ava" v-bind:src="user.ava">
+            <div class="thread-link__dialog">
+              <div class="thread-link__content">
                           <span class="thread-participant_name">
                             {{ user.first_name + ' ' + user.last_name }}
                           </span>
-                  </div>
-                </div>
-                <svg class="add_to_thread" width="25" height="25">
-                  <use xlink:href="/content/themes/myinvision/assets/images/add.svg#add"></use>
-                </svg>
-              </a>
-            </li>
-          </ul>
-        </form>
+              </div>
+            </div>
+            <svg class="add_to_thread" width="25" height="25">
+              <use xlink:href="/content/themes/myinvision/assets/images/privateMsg#privateMsg"></use>
+            </svg>
+          </a>
+        </li>
       </ul>
-<!--      <ul v-else-if="addingChat === 'private'">-->
-<!--      </ul>-->
 <!--      <ul v-else  class="menu-threads__list">-->
 
 <!--        <li v-for="thread in threadsData"-->
@@ -281,6 +296,15 @@ export default {
       }).then( response => {
         this.addingChat = null;
        console.log(response.data);
+      })
+    },
+    openOrCreatePrivateThread: function (e)
+    {
+      axios.post('/chat/create_private_thread/', {
+        'recipient': e.target.dataset.id,
+      }).then( response => {
+        this.addingChat = null;
+        console.log(response.data);
       })
     }
   }
