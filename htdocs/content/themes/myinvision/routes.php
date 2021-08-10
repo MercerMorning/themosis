@@ -23,6 +23,10 @@ Route::get('chat/get_thread/',
 Route::post('chat/send_message_to_thread/',
     [\Theme\Controllers\MessagesController::class,
         'storeMessage'])->name('send_message_to_thread');
+
+Route::post('chat/create_group_thread/',
+    [\Theme\Controllers\MessagesController::class,
+        'store'])->name('create_group_thread');
 //
 //Route::post('chat/send_message_to_user/',
 //    [\Theme\Controllers\PersonalCorrespondence::class,

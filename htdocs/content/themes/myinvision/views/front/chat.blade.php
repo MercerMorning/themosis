@@ -7,6 +7,7 @@
                         currentthread="{{ $currentThread }}"
                         threadmessages ="{{ $threadMessages }}"
                         threads="{{ $threads }}"
+                        users="{{ $users }}"
                 >
                 </chat-component>
             </div>

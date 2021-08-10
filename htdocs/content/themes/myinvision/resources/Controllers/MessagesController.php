@@ -30,6 +30,9 @@ class MessagesController extends Controller
         $currentUserData = UserPrepareService::currentUserPresenter();
         $threadMessages = null;
         $currentThread = null;
+        $users = User::all()->map(function ($user) {
+           return  UserPrepareService::threadPresenterData($user->ID);
+        })->toArray();
         if (isset($_COOKIE['currentThreadId'])) {
             $threadInfo = $this->showThread(new Request(['id' => $_COOKIE['currentThreadId']]));
             $threadMessages = $threadInfo['threadMessages'];
@@ -41,6 +44,7 @@ class MessagesController extends Controller
             'threadMessages' => json_encode($threadMessages),
             'currentUser' => json_encode($currentUserData),
             'threads' => json_encode($threads),
+            'users' => json_encode($users),
         ])->render();
         return $chat;
     }
@@ -171,7 +175,10 @@ class MessagesController extends Controller
 
         $messages = $query->get();
 
-        return response(compact($messages, $thread, $threads));
+        $threads =  Thread::forUser(AuthUser::currentUserId())
+            ->latest('updated_at')
+            ->get();;
+        return response(['threads' => $threads]);
     }
 
     public function addUsers(Request $request, $id)
