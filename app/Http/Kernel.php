@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\IsUserOnline;
 use Themosis\Core\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -13,7 +14,9 @@ class Kernel extends HttpKernel
      *
      * @var array
      */
-    protected $middleware = [];
+    protected $middleware = [
+        IsUserOnline::class
+    ];
 
     /**
      * The application's route middleware groups.

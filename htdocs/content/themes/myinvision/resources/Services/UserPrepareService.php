@@ -3,6 +3,7 @@ namespace Theme\Services;
 
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Theme\Models\Thread;
 use Theme\Models\ThreadMessage;
 use Theme\Models\ThreadParticipant;
@@ -14,6 +15,7 @@ class UserPrepareService
     {
         $userData = [
             'id' => $userId,
+            'online' => Cache::get('user-is-online-' . $userId) ? 1 : 0,
             'first_name' => get_user_meta( $userId, 'first_name', true ),
             'last_name' => get_user_meta( $userId, 'last_name', true ),
             'ava' => get_user_meta( $userId, 'avatar', true ) == '^ ""'
