@@ -300,8 +300,10 @@ export default {
     },
     openOrCreatePrivateThread: function (e)
     {
+      let userId = e.target.closest('.menu-threads__item');
+      console.log(e.target)
       axios.post('/chat/create_private_thread/', {
-        'recipient': e.target.dataset.id,
+        'recipient': userId.dataset.id,
       }).then( response => {
         this.addingChat = null;
         console.log(response.data);

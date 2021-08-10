@@ -2265,8 +2265,10 @@ __webpack_require__.r(__webpack_exports__);
     openOrCreatePrivateThread: function openOrCreatePrivateThread(e) {
       var _this5 = this;
 
+      var userId = e.target.closest('.menu-threads__item');
+      console.log(e.target);
       axios.post('/chat/create_private_thread/', {
-        'recipient': e.target.dataset.id
+        'recipient': userId.dataset.id
       }).then(function (response) {
         _this5.addingChat = null;
         console.log(response.data);

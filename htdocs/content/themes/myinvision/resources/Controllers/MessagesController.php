@@ -47,6 +47,7 @@ class MessagesController extends Controller
             'threads' => json_encode($threads),
             'users' => json_encode($users),
         ])->render();
+//        dd($threads->toArray());
         return $chat;
     }
 
@@ -56,6 +57,19 @@ class MessagesController extends Controller
             ->latest('updated_at')
             ->get();;
         $threads->map(function ($thread) {
+            if ($thread->is_private) {
+                $thread->participants()
+                    ->get()
+                    ->pluck('user_id')
+                    ->each(function ($participant) use ($thread) {
+                        if ($participant !== (wp_get_current_user()->ID)) {
+                            $userData = UserPrepareService::threadPresenterData($participant);
+                            $thread->ava = $userData['ava'];
+                            $thread->subject = $userData['first_name'] . ' ' . $userData['last_name'];
+                        }
+                    }
+                );
+            }
             $lastMessageData = $thread
                 ->messages()
                 ->get()
