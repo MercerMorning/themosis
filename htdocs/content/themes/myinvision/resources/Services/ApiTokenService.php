@@ -1,4 +1,5 @@
 <?php
+
 namespace Theme\Services;
 
 use App\Http\Controllers\Controller;
@@ -13,7 +14,7 @@ class ApiTokenService extends Controller
     /**
      * Update the authenticated user's API token.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return array
      */
     public static function update()
@@ -27,7 +28,7 @@ class ApiTokenService extends Controller
         } else {
             UserToken::query()
                 ->where('user_id', AuthUser::currentUserId())
-                ->update([ 'api_token' => hash('sha256', $token)]);
+                ->update(['api_token' => hash('sha256', $token)]);
         }
 
         return ['token' => $token];

@@ -29,11 +29,14 @@ class MessagesController extends Controller
         $userToken = ApiTokenService::update()['token'];
         $threads = $this->getAllThreads();
         $currentUserData = UserPrepareService::currentUserPresenter();
-        $threadMessages = null;
-        $currentThread = null;
-        $users = User::all()->map(function ($user) {
-           return  UserPrepareService::threadPresenterData($user->ID);
-        })->toArray();
+        $threadMessages = NULL;
+        $currentThread = NULL;
+        $users = User::query()
+            ->whereNotIn('ID', [AuthUser::currentUserId()])
+            ->get()
+            ->map(function ($user) {
+                return UserPrepareService::threadPresenterData($user->ID);
+            })->toArray();
         if (isset($_COOKIE['currentThreadId'])) {
             $threadInfo = $this->showThread(new Request(['id' => $_COOKIE['currentThreadId']]));
             $threadMessages = $threadInfo['threadMessages'];
@@ -51,9 +54,9 @@ class MessagesController extends Controller
         return $chat;
     }
 
-    public function getAllThreads($userId = null)
+    public function getAllThreads($userId = NULL)
     {
-        $threads =  Thread::forUser($userId ?? AuthUser::currentUserId())
+        $threads = Thread::forUser($userId ?? AuthUser::currentUserId())
             ->latest('updated_at')
             ->get();;
         $threads->map(function ($thread) {
@@ -68,7 +71,7 @@ class MessagesController extends Controller
                             $thread->subject = $userData['first_name'] . ' ' . $userData['last_name'];
                         }
                     }
-                );
+                    );
             }
             $lastMessageData = $thread
                 ->messages()
@@ -84,6 +87,7 @@ class MessagesController extends Controller
         $threads = $threads->sortBy('updated_at');
         return $threads;
     }
+
     /**
      * Shows a message thread.
      *
@@ -107,7 +111,7 @@ class MessagesController extends Controller
 
         $messages = $thread->messages()
 //            ->with('user')
-            ->latest()
+            ->oldest()
             ->get()
             ->map(function ($message) {
                 $message->date = $message->created_at->format('d.m.Y');
@@ -125,17 +129,18 @@ class MessagesController extends Controller
                             $message->isFile = true;
 
                         }
+                        $message->datetime = Carbon::parse($message->created_at)->format('H:i');
                         return $message;
                     })
                     ->toArray();
                 $formatedMessages = [];
                 $messagesGroupKey = 0;
-                $lastMessage = null;
+                $lastMessage = NULL;
                 for ($i = 0; $i < count($messages); $i++) {
                     if ($i == 0) {
                         $lastMessage = $formatedMessages[$messagesGroupKey][] = $messages[$i];
                     } else {
-                        if ($lastMessage['user_id'] !=  $messages[$i]['user_id']) {
+                        if ($lastMessage['user_id'] != $messages[$i]['user_id']) {
                             $messagesGroupKey++;
                         }
                         $lastMessage = $formatedMessages[$messagesGroupKey][] = $messages[$i];
@@ -145,9 +150,9 @@ class MessagesController extends Controller
                     return [
                         'messages' => $userMessages,
                         'user_info' =>
-                        UserPrepareService::threadPresenterData(
-                            $userMessages[0]['user_id']
-                        )
+                            UserPrepareService::threadPresenterData(
+                                $userMessages[0]['user_id']
+                            )
                     ];
                 });
                 return $formatedMessages;
@@ -187,12 +192,7 @@ class MessagesController extends Controller
             ->with('user')
             ->latest();
 
-
-        $messages = $query->get();
-
-        $threads =  Thread::forUser(AuthUser::currentUserId())
-            ->latest('updated_at')
-            ->get();;
+        $threads = $this->getAllThreads();
         return response(['threads' => $threads]);
     }
 
@@ -221,10 +221,10 @@ class MessagesController extends Controller
 
         $messages = $query->get();
 
-        $threads =  Thread::forUser(AuthUser::currentUserId())
+        $threads = Thread::forUser(AuthUser::currentUserId())
             ->latest('updated_at')
             ->get();;
-        return response(['threads' => $threads]);
+        return response($this->showThread(new Request(['id' => $thread->id])));
     }
 
     public function addUsers(Request $request, $id)
@@ -232,7 +232,7 @@ class MessagesController extends Controller
         try {
             $thread = Thread::findOrFail($id);
         } catch (ModelNotFoundException $e) {
-           return response('The thread with ID: ' . $id . ' was not found.', 404);
+            return response('The thread with ID: ' . $id . ' was not found.', 404);
         }
 
         if ($request->has('recipients')) {
@@ -256,7 +256,7 @@ class MessagesController extends Controller
             return response('', 400);
         }
 
-        $messageBody =  $request->get('body');
+        $messageBody = $request->get('body');
 
         if ($request->get('file')) {
             $messageBody = ' ';
@@ -269,14 +269,14 @@ class MessagesController extends Controller
         ]);
 
         if ($request->get('file')) {
-                $fileName = "file_" . Str::uuid();
-                file_put_contents(get_template_directory() . '/storage/' . $fileName, $request->get('file'));
-                Attachment::create([
-                    'message_id' => $message->id,
-                    'path' => get_template_directory_uri() . '/storage/' . $fileName]);
+            $fileName = "file_" . Str::uuid();
+            file_put_contents(get_template_directory() . '/storage/' . $fileName, $request->get('file'));
+            Attachment::create([
+                'message_id' => $message->id,
+                'path' => get_template_directory_uri() . '/storage/' . $fileName]);
         }
 
-//        return $this->showThread(new Request(['user_id' => $request->get('user_id'),'id' => $request->get('thread_id')]))['threadMessages'];
-        return $this->showThread(new Request(['user_id' => $request->get('user_id'),'id' => $request->get('thread_id')]));
+
+        return $this->showThread(new Request(['user_id' => $request->get('user_id'), 'id' => $request->get('thread_id')]));
     }
 }

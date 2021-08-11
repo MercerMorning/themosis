@@ -20,6 +20,7 @@ textarea {
 }
 
 .chat-container ul {
+    overflow-y: auto;
     list-style: none;
     padding: 0px;
 }
@@ -35,7 +36,7 @@ textarea {
     align-items: center;
 }
 
-.add_chat_item  svg {
+.add_chat_item svg {
     width: 28px;
     height: 24px;
 }
@@ -45,8 +46,8 @@ textarea {
 }
 
 .chat-body {
+    overflow-y: auto;
     margin-top: 20px;
-    display: flex;
     flex-direction: column;
     justify-content: flex-end;
 }
@@ -96,7 +97,7 @@ a {
     border-bottom: 1px solid #4E4E4E;
 }
 
-.menu-threads__item.active{
+.menu-threads__item.active {
     background-color: #FF0050;
     box-shadow: 0px 8px 40px rgba(255, 0, 80, 0.3);
 }
@@ -144,10 +145,11 @@ a {
 .chat-message__date {
     width: 100%;
     margin-bottom: 20px;
+    margin-top: 20px;
     text-align: center;
 }
 
-.chat-message__date span{
+.chat-message__date span {
     background-color: #6588DE;
     padding: 4px 20px;
     border-radius: 14px;
@@ -159,11 +161,18 @@ a {
 }
 
 .chat-body .chat-message__message_foreign-user {
-    padding-left: 18px;
+    /*padding-left: 18px;*/
+    display: flow-root;
 }
-.chat-body .chat-message__message_current-user {
 
+.chat-body .chat-message__message_current-user {
+    display: flow-root;
     /*padding-right: 18px;*/
+}
+
+.chat-message__message_current-user .chat-message__message_message-content {
+    display: flex;
+    flex-direction: row-reverse;
 }
 
 .chat-message__message_message-body .chat-message__text {
@@ -238,9 +247,9 @@ a {
 }
 
 .creat-group_thread__title {
-    padding: 10px;
-    width: 100%;
     text-align: center;
+    width: 100%;
+    display: block;
 }
 
 .create_group_chat {
@@ -290,7 +299,6 @@ a {
     align-items: center;
     margin-left: 5px;
 }
-
 
 
 .chat-footer__input-file {
@@ -344,10 +352,10 @@ a {
 }
 
 .input-message {
-    border:none;
-    background:none;
-    outline:none;
-    padding:0;
+    border: none;
+    background: none;
+    outline: none;
+    padding: 0;
 }
 
 .input-message:focus {
@@ -386,15 +394,18 @@ a {
     .menu-threads__current-user {
         display: none;
     }
+
     .menu-threads__list {
         background: none;
         margin: 0px;
     }
+
     .menu-threads {
         margin-right: 37px;
         min-width: 100%;
         width: 100%;
     }
+
     .send-button_text {
         display: none;
     }
@@ -410,7 +421,6 @@ a {
     /*.chat-message__message_foreign-user .chat-message__message_message-content {*/
     /*    margin-left: 30px;*/
     /*}*/
-
     .chat-message__date {
         /*margin: 20px;*/
 
@@ -437,4 +447,12 @@ a {
 
 .hidden {
     display: none;
+}
+
+.message_image {
+    max-width: 500px;
+}
+
+a {
+    cursor: pointer;
 }

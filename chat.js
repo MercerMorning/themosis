@@ -12,6 +12,7 @@ const webSocketServer = new WebSocket.Server({ server });
 
 webSocketServer.on('connection', ws => {
     ws.on('message', message => {
+        let parsedMessage = JSON.parse(message);
         axios.post(domen + '/chat/send_message_to_thread/',  {
             'body' : parsedMessage.body,
             'thread_id' : parsedMessage.thread_id,
