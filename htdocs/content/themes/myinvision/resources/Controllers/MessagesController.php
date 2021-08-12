@@ -121,7 +121,35 @@ class MessagesController extends Controller
         $threads = $this->getAllThreads($request->get('user_id'));
 
         try {
-            $thread = Thread::find($id);
+            $thread = Thread::query()
+                ->where('id', $id)
+                ->get()
+                ->map(function ($thread) {
+                if ($thread->is_private) {
+                    $thread->participants()
+                        ->get()
+                        ->pluck('user_id')
+                        ->each(function ($participant) use ($thread) {
+                            if ($participant !== (wp_get_current_user()->ID)) {
+                                $userData = UserPrepareService::threadPresenterData($participant);
+                                $thread->ava = $userData['ava'];
+                                $thread->subject = $userData['first_name'] . ' ' . $userData['last_name'];
+                            }
+                        }
+                        );
+                }
+                $lastMessageData = $thread
+                    ->messages()
+                    ->get()
+                    ->last();
+                $thread->lastMessage =
+                    $lastMessageData ? UserPrepareService::threadPresenterLastMessage(
+                        $lastMessageData->user_id, $lastMessageData->body
+                    ) : '';
+                $thread->datetime = Carbon::parse($thread->updated_at)->format('d/m/Y');
+                return $thread;
+            });
+            $thread = $thread[0];
         } catch (ModelNotFoundException $e) {
             return response('The thread with ID: ' . $id . ' was not found.', 404);
         }

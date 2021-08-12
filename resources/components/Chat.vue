@@ -1,6 +1,8 @@
 <template>
   <div class="chat-container">
-    <div class="menu-threads">
+    <div v-bind:class="[!currentThread
+               ? 'menu-threads'
+               : 'menu-threads mobile-hidden']">
       <div class="menu-threads__current-user">
         <a class="menu-threads__link current-user">
           <img class="thread-link__participant_ava" v-bind:src="currentUserData.ava">
@@ -115,13 +117,16 @@
         </li>
       </ul>
     </div>
-    <div class="chat mobile-hidden">
-      <div class="chat__participant-chat">
+    <div  v-bind:class="[currentThread
+               ? 'chat'
+               : 'chat mobile-hidden']">
+      <div class="chat__participant-chat" v-on:click="backToThreadList">
         <svg width="20" height="18">
           <use xlink:href="/content/themes/myinvision/assets//images/previous.svg#previous"></use>
         </svg>
-        <span>Phillip Torff</span>
-        <img class="" src="/content/themes/myinvision/assets/images/person.png">
+        <span>{{ currentThread.subject }}</span>
+        <img v-if="currentThread.is_private" class="thread-link__participant_ava-mobile" v-bind:src="currentThread.ava">
+        <div v-else class="thread-link__participant_ava-mobile"></div>
       </div>
       <div class="chat-body">
 
@@ -240,6 +245,8 @@ export default {
         this.threadsData = response.data.threads
         this.currentThread = response.data.currentThread;
         this.threadMessages = response.data.threadMessages;
+        jQuery('.chat').removeClass('mobile-hidden')
+        jQuery('.menu-threads').addClass('mobile-hidden')
       })
     },
     sendMessage: function (event) {
@@ -319,6 +326,11 @@ export default {
         // this.currentThread = response.data.currentThread;
       })
       this.addingChat = null;
+    },
+    backToThreadList: function ()
+    {
+      jQuery('.chat').addClass('mobile-hidden')
+      jQuery('.menu-threads').removeClass('mobile-hidden')
     }
   }
 

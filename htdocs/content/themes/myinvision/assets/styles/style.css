@@ -224,6 +224,11 @@ a {
     border-radius: 50%;
 }
 
+.thread-link__participant_ava-mobile {
+    width: 44px;
+    border-radius: 50%;
+}
+
 .chat-message__message_message-content .thread-link__participant_ava {
     align-self: flex-start;
 }
@@ -371,9 +376,18 @@ a {
 }
 
 @media screen and (max-width: 960px) {
+    .menu-threads__list {
+        height: 85%;
+    }
+
+
     .chat {
         margin-right: 0px;
         justify-content: flex-end;
+    }
+
+    .chat-body {
+        margin-top: 60px;
     }
 
     .chat-body .chat-message__message_foreign-user {

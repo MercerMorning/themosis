@@ -2144,6 +2144,11 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   mounted: function mounted() {
     var _this = this;
@@ -2202,6 +2207,8 @@ __webpack_require__.r(__webpack_exports__);
         _this2.threadsData = response.data.threads;
         _this2.currentThread = response.data.currentThread;
         _this2.threadMessages = response.data.threadMessages;
+        jQuery('.chat').removeClass('mobile-hidden');
+        jQuery('.menu-threads').addClass('mobile-hidden');
       });
     },
     sendMessage: function sendMessage(event) {
@@ -2291,6 +2298,10 @@ __webpack_require__.r(__webpack_exports__);
         _this5.privateUsersData = response.data.privateUsers; // this.currentThread = response.data.currentThread;
       });
       this.addingChat = null;
+    },
+    backToThreadList: function backToThreadList() {
+      jQuery('.chat').addClass('mobile-hidden');
+      jQuery('.menu-threads').removeClass('mobile-hidden');
     }
   }
 });
@@ -14319,293 +14330,327 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "chat-container" }, [
-    _c("div", { staticClass: "menu-threads" }, [
-      _c("div", { staticClass: "menu-threads__current-user" }, [
-        _c("a", { staticClass: "menu-threads__link current-user" }, [
-          _c("img", {
-            staticClass: "thread-link__participant_ava",
-            attrs: { src: _vm.currentUserData.ava }
-          }),
-          _vm._v(" "),
-          _c("div", { staticClass: "thread-link__current-user_name" }, [
-            _vm._v(
-              "\n          " +
-                _vm._s(
-                  _vm.currentUserData.first_name +
-                    " " +
-                    _vm.currentUserData.last_name
-                ) +
-                "\n        "
-            )
+    _c(
+      "div",
+      {
+        class: [
+          !_vm.currentThread ? "menu-threads" : "menu-threads mobile-hidden"
+        ]
+      },
+      [
+        _c("div", { staticClass: "menu-threads__current-user" }, [
+          _c("a", { staticClass: "menu-threads__link current-user" }, [
+            _c("img", {
+              staticClass: "thread-link__participant_ava",
+              attrs: { src: _vm.currentUserData.ava }
+            }),
+            _vm._v(" "),
+            _c("div", { staticClass: "thread-link__current-user_name" }, [
+              _vm._v(
+                "\n          " +
+                  _vm._s(
+                    _vm.currentUserData.first_name +
+                      " " +
+                      _vm.currentUserData.last_name
+                  ) +
+                  "\n        "
+              )
+            ])
           ])
-        ])
-      ]),
-      _vm._v(" "),
-      _vm.addingChat === "group"
-        ? _c("ul", { staticClass: "menu-threads__list" }, [
-            _c(
-              "form",
-              {
-                on: {
-                  submit: function($event) {
-                    $event.preventDefault()
-                    return _vm.createGroupThread.apply(null, arguments)
-                  }
-                }
-              },
-              [
-                _c("span", { staticClass: "creat-group_thread__title" }, [
-                  _vm._v("Создание группового чата")
-                ]),
-                _vm._v(" "),
-                _c(
-                  "div",
-                  { staticClass: "create-group_thread__input-input_container" },
-                  [
-                    _c("svg", { attrs: { width: "75", height: "75" } }, [
-                      _c("use", {
-                        attrs: {
-                          "xlink:href":
-                            "/content/themes/myinvision/assets/images/open_adding_group_thread_modal.svg#add_group"
-                        }
-                      })
-                    ]),
-                    _vm._v(" "),
-                    _vm._m(0)
-                  ]
-                ),
-                _vm._v(" "),
-                _c(
-                  "ul",
-                  _vm._l(_vm.usersData, function(user) {
-                    return _c(
-                      "li",
-                      {
-                        staticClass: "menu-threads__item",
-                        attrs: { "data-id": user.id },
-                        on: { click: _vm.addParticipant }
-                      },
-                      [
-                        _c("a", { staticClass: "menu-threads__link" }, [
-                          _c("img", {
-                            staticClass: "thread-link__participant_ava",
-                            attrs: { src: user.ava }
-                          }),
-                          _vm._v(" "),
-                          _c("div", { staticClass: "thread-link__dialog" }, [
-                            _c("div", { staticClass: "thread-link__content" }, [
-                              _c(
-                                "span",
-                                { staticClass: "thread-participant_name" },
-                                [
-                                  _vm._v(
-                                    "\n                          " +
-                                      _vm._s(
-                                        user.first_name + " " + user.last_name
-                                      ) +
-                                      "\n                        "
-                                  )
-                                ]
-                              )
-                            ])
-                          ]),
-                          _vm._v(" "),
-                          _c(
-                            "svg",
-                            {
-                              staticClass: "add_to_thread",
-                              attrs: { width: "25", height: "25" }
-                            },
-                            [
-                              _c("use", {
-                                attrs: {
-                                  "xlink:href":
-                                    "/content/themes/myinvision/assets/images/add.svg#add"
-                                }
-                              })
-                            ]
-                          )
-                        ])
-                      ]
-                    )
-                  }),
-                  0
-                )
-              ]
-            )
-          ])
-        : _vm.addingChat === "private"
-        ? _c(
-            "ul",
-            { staticClass: "menu-threads__list" },
-            _vm._l(_vm.privateUsersData, function(user) {
-              return _c(
-                "li",
+        ]),
+        _vm._v(" "),
+        _vm.addingChat === "group"
+          ? _c("ul", { staticClass: "menu-threads__list" }, [
+              _c(
+                "form",
                 {
-                  staticClass: "menu-threads__item",
-                  attrs: { "data-id": user.id },
-                  on: { click: _vm.openOrCreatePrivateThread }
+                  on: {
+                    submit: function($event) {
+                      $event.preventDefault()
+                      return _vm.createGroupThread.apply(null, arguments)
+                    }
+                  }
                 },
                 [
-                  _c("a", { staticClass: "menu-threads__link" }, [
-                    _c("img", {
-                      staticClass: "thread-link__participant_ava",
-                      attrs: { src: user.ava }
-                    }),
-                    _vm._v(" "),
-                    _c("div", { staticClass: "thread-link__dialog" }, [
-                      _c("div", { staticClass: "thread-link__content" }, [
-                        _c("span", { staticClass: "thread-participant_name" }, [
-                          _vm._v(
-                            "\n                          " +
-                              _vm._s(user.first_name + " " + user.last_name) +
-                              "\n                        "
-                          )
-                        ])
-                      ])
-                    ]),
-                    _vm._v(" "),
-                    _c(
-                      "svg",
-                      {
-                        staticClass: "add_to_thread",
-                        attrs: { width: "25", height: "25" }
-                      },
-                      [
+                  _c("span", { staticClass: "creat-group_thread__title" }, [
+                    _vm._v("Создание группового чата")
+                  ]),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    {
+                      staticClass: "create-group_thread__input-input_container"
+                    },
+                    [
+                      _c("svg", { attrs: { width: "75", height: "75" } }, [
                         _c("use", {
                           attrs: {
                             "xlink:href":
-                              "/content/themes/myinvision/assets/images/privateMsg#privateMsg"
+                              "/content/themes/myinvision/assets/images/open_adding_group_thread_modal.svg#add_group"
                           }
                         })
-                      ]
-                    )
-                  ])
-                ]
-              )
-            }),
-            0
-          )
-        : _c(
-            "ul",
-            { staticClass: "menu-threads__list" },
-            _vm._l(_vm.threadsData, function(thread) {
-              return _c(
-                "li",
-                {
-                  class: [
-                    thread.id === _vm.currentThread.id
-                      ? "menu-threads__item active"
-                      : "menu-threads__item"
-                  ],
-                  attrs: { "data-id": thread.id },
-                  on: { click: _vm.showThread }
-                },
-                [
-                  _c("a", { staticClass: "menu-threads__link" }, [
-                    thread.is_private
-                      ? _c("img", {
-                          staticClass: "thread-link__participant_ava",
-                          attrs: { src: thread.ava }
-                        })
-                      : _c("div", {
-                          staticClass: "thread-link__participant_ava"
-                        }),
-                    _vm._v(" "),
-                    _c("div", { staticClass: "thread-link__dialog" }, [
-                      _c("div", { staticClass: "thread-link__content" }, [
-                        _c("span", { staticClass: "thread-participant_name" }, [
-                          _vm._v(_vm._s(thread.subject))
-                        ]),
-                        _vm._v(" "),
-                        _c(
-                          "span",
-                          { staticClass: "thread-participant_message" },
-                          [_vm._v(_vm._s(thread.lastMessage))]
-                        )
                       ]),
                       _vm._v(" "),
-                      _c("div", { staticClass: "thread-link__date-time" }, [
-                        _c("span", [_vm._v(_vm._s(thread.datetime))])
-                      ])
-                    ])
-                  ])
+                      _vm._m(0)
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "ul",
+                    _vm._l(_vm.usersData, function(user) {
+                      return _c(
+                        "li",
+                        {
+                          staticClass: "menu-threads__item",
+                          attrs: { "data-id": user.id },
+                          on: { click: _vm.addParticipant }
+                        },
+                        [
+                          _c("a", { staticClass: "menu-threads__link" }, [
+                            _c("img", {
+                              staticClass: "thread-link__participant_ava",
+                              attrs: { src: user.ava }
+                            }),
+                            _vm._v(" "),
+                            _c("div", { staticClass: "thread-link__dialog" }, [
+                              _c(
+                                "div",
+                                { staticClass: "thread-link__content" },
+                                [
+                                  _c(
+                                    "span",
+                                    { staticClass: "thread-participant_name" },
+                                    [
+                                      _vm._v(
+                                        "\n                          " +
+                                          _vm._s(
+                                            user.first_name +
+                                              " " +
+                                              user.last_name
+                                          ) +
+                                          "\n                        "
+                                      )
+                                    ]
+                                  )
+                                ]
+                              )
+                            ]),
+                            _vm._v(" "),
+                            _c(
+                              "svg",
+                              {
+                                staticClass: "add_to_thread",
+                                attrs: { width: "25", height: "25" }
+                              },
+                              [
+                                _c("use", {
+                                  attrs: {
+                                    "xlink:href":
+                                      "/content/themes/myinvision/assets/images/add.svg#add"
+                                  }
+                                })
+                              ]
+                            )
+                          ])
+                        ]
+                      )
+                    }),
+                    0
+                  )
                 ]
               )
-            }),
-            0
-          ),
-      _vm._v(" "),
-      _c("ul", { staticClass: "menu-threads__adding_chat" }, [
-        _c("li", { staticClass: "add_chat_item" }, [
-          _c("svg", { attrs: { width: "20", height: "18" } }, [
-            _c("use", {
-              attrs: {
-                "xlink:href":
-                  "/content/themes/myinvision/assets/images/add_group_thread.svg#add_thread"
-              }
-            })
-          ]),
-          _vm._v(" "),
-          _c(
-            "a",
-            {
-              staticClass: "add_chat_item__make_chat_link",
-              on: {
-                click: function($event) {
-                  $event.preventDefault()
-                  return _vm.openGroupChatAdd.apply(null, arguments)
-                }
-              }
-            },
-            [_vm._v("\n          Создать групповой чат\n        ")]
-          )
-        ]),
+            ])
+          : _vm.addingChat === "private"
+          ? _c(
+              "ul",
+              { staticClass: "menu-threads__list" },
+              _vm._l(_vm.privateUsersData, function(user) {
+                return _c(
+                  "li",
+                  {
+                    staticClass: "menu-threads__item",
+                    attrs: { "data-id": user.id },
+                    on: { click: _vm.openOrCreatePrivateThread }
+                  },
+                  [
+                    _c("a", { staticClass: "menu-threads__link" }, [
+                      _c("img", {
+                        staticClass: "thread-link__participant_ava",
+                        attrs: { src: user.ava }
+                      }),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "thread-link__dialog" }, [
+                        _c("div", { staticClass: "thread-link__content" }, [
+                          _c(
+                            "span",
+                            { staticClass: "thread-participant_name" },
+                            [
+                              _vm._v(
+                                "\n                          " +
+                                  _vm._s(
+                                    user.first_name + " " + user.last_name
+                                  ) +
+                                  "\n                        "
+                              )
+                            ]
+                          )
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "svg",
+                        {
+                          staticClass: "add_to_thread",
+                          attrs: { width: "25", height: "25" }
+                        },
+                        [
+                          _c("use", {
+                            attrs: {
+                              "xlink:href":
+                                "/content/themes/myinvision/assets/images/privateMsg#privateMsg"
+                            }
+                          })
+                        ]
+                      )
+                    ])
+                  ]
+                )
+              }),
+              0
+            )
+          : _c(
+              "ul",
+              { staticClass: "menu-threads__list" },
+              _vm._l(_vm.threadsData, function(thread) {
+                return _c(
+                  "li",
+                  {
+                    class: [
+                      thread.id === _vm.currentThread.id
+                        ? "menu-threads__item active"
+                        : "menu-threads__item"
+                    ],
+                    attrs: { "data-id": thread.id },
+                    on: { click: _vm.showThread }
+                  },
+                  [
+                    _c("a", { staticClass: "menu-threads__link" }, [
+                      thread.is_private
+                        ? _c("img", {
+                            staticClass: "thread-link__participant_ava",
+                            attrs: { src: thread.ava }
+                          })
+                        : _c("div", {
+                            staticClass: "thread-link__participant_ava"
+                          }),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "thread-link__dialog" }, [
+                        _c("div", { staticClass: "thread-link__content" }, [
+                          _c(
+                            "span",
+                            { staticClass: "thread-participant_name" },
+                            [_vm._v(_vm._s(thread.subject))]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "span",
+                            { staticClass: "thread-participant_message" },
+                            [_vm._v(_vm._s(thread.lastMessage))]
+                          )
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "thread-link__date-time" }, [
+                          _c("span", [_vm._v(_vm._s(thread.datetime))])
+                        ])
+                      ])
+                    ])
+                  ]
+                )
+              }),
+              0
+            ),
         _vm._v(" "),
-        _c("li", { staticClass: "add_chat_item" }, [
-          _c("svg", { attrs: { width: "20", height: "18" } }, [
-            _c("use", {
-              attrs: {
-                "xlink:href":
-                  "/content/themes/myinvision/assets/images/add_group_thread.svg#add_thread"
-              }
-            })
+        _c("ul", { staticClass: "menu-threads__adding_chat" }, [
+          _c("li", { staticClass: "add_chat_item" }, [
+            _c("svg", { attrs: { width: "20", height: "18" } }, [
+              _c("use", {
+                attrs: {
+                  "xlink:href":
+                    "/content/themes/myinvision/assets/images/add_group_thread.svg#add_thread"
+                }
+              })
+            ]),
+            _vm._v(" "),
+            _c(
+              "a",
+              {
+                staticClass: "add_chat_item__make_chat_link",
+                on: {
+                  click: function($event) {
+                    $event.preventDefault()
+                    return _vm.openGroupChatAdd.apply(null, arguments)
+                  }
+                }
+              },
+              [_vm._v("\n          Создать групповой чат\n        ")]
+            )
           ]),
           _vm._v(" "),
-          _c(
-            "a",
-            {
-              staticClass: "add_chat_item__make_chat_link",
-              on: {
-                click: function($event) {
-                  $event.preventDefault()
-                  return _vm.openCreatingPrivateThread.apply(null, arguments)
+          _c("li", { staticClass: "add_chat_item" }, [
+            _c("svg", { attrs: { width: "20", height: "18" } }, [
+              _c("use", {
+                attrs: {
+                  "xlink:href":
+                    "/content/themes/myinvision/assets/images/add_group_thread.svg#add_thread"
                 }
-              }
-            },
-            [_vm._v("\n          Создать личный чат\n        ")]
-          )
+              })
+            ]),
+            _vm._v(" "),
+            _c(
+              "a",
+              {
+                staticClass: "add_chat_item__make_chat_link",
+                on: {
+                  click: function($event) {
+                    $event.preventDefault()
+                    return _vm.openCreatingPrivateThread.apply(null, arguments)
+                  }
+                }
+              },
+              [_vm._v("\n          Создать личный чат\n        ")]
+            )
+          ])
         ])
-      ])
-    ]),
+      ]
+    ),
     _vm._v(" "),
-    _c("div", { staticClass: "chat mobile-hidden" }, [
-      _c("div", { staticClass: "chat__participant-chat" }, [
-        _c("svg", { attrs: { width: "20", height: "18" } }, [
-          _c("use", {
-            attrs: {
-              "xlink:href":
-                "/content/themes/myinvision/assets//images/previous.svg#previous"
-            }
-          })
-        ]),
-        _vm._v(" "),
-        _c("span", [_vm._v("Phillip Torff")]),
-        _vm._v(" "),
-        _c("img", {
-          attrs: { src: "/content/themes/myinvision/assets/images/person.png" }
-        })
-      ]),
+    _c("div", { class: [_vm.currentThread ? "chat" : "chat mobile-hidden"] }, [
+      _c(
+        "div",
+        {
+          staticClass: "chat__participant-chat",
+          on: { click: _vm.backToThreadList }
+        },
+        [
+          _c("svg", { attrs: { width: "20", height: "18" } }, [
+            _c("use", {
+              attrs: {
+                "xlink:href":
+                  "/content/themes/myinvision/assets//images/previous.svg#previous"
+              }
+            })
+          ]),
+          _vm._v(" "),
+          _c("span", [_vm._v(_vm._s(_vm.currentThread.subject))]),
+          _vm._v(" "),
+          _vm.currentThread.is_private
+            ? _c("img", {
+                staticClass: "thread-link__participant_ava-mobile",
+                attrs: { src: _vm.currentThread.ava }
+              })
+            : _c("div", { staticClass: "thread-link__participant_ava-mobile" })
+        ]
+      ),
       _vm._v(" "),
       _c(
         "div",
