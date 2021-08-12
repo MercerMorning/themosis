@@ -31,6 +31,7 @@ class MessagesController extends Controller
         $currentUserData = UserPrepareService::currentUserPresenter();
         $threadMessages = NULL;
         $currentThread = NULL;
+        $userForCreatePrivateChat = $this->getPrivateUsers();
         $users = User::query()
             ->whereNotIn('ID', [AuthUser::currentUserId()])
             ->get()
@@ -49,9 +50,29 @@ class MessagesController extends Controller
             'currentUser' => json_encode($currentUserData),
             'threads' => json_encode($threads),
             'users' => json_encode($users),
+            'privateUsers' => json_encode($userForCreatePrivateChat),
         ])->render();
 //        dd($threads->toArray());
         return $chat;
+    }
+
+    private function getPrivateUsers()
+    {
+        return   User::query()
+            ->where('ID', '!=', AuthUser::currentUserId())
+            ->whereNotIn('ID', Thread::query()
+                ->where('is_private', 1)
+                ->get()
+                ->map(function ($privateThread) {
+                    return $privateThread
+                        ->participants()
+                        ->where('user_id', '!=', AuthUser::currentUserId())
+                        ->first()->user_id;
+                }))
+            ->get()
+            ->map(function ($user) {
+                return UserPrepareService::threadPresenterData($user->ID);
+            })->toArray();
     }
 
     public function getAllThreads($userId = NULL)
@@ -223,8 +244,10 @@ class MessagesController extends Controller
 
         $threads = Thread::forUser(AuthUser::currentUserId())
             ->latest('updated_at')
-            ->get();;
-        return response($this->showThread(new Request(['id' => $thread->id])));
+            ->get();
+        $thread = $this->showThread(new Request(['id' => $thread->id]));
+        $thread['privateUsers'] =  $this->getPrivateUsers();
+        return response($thread);
     }
 
     public function addUsers(Request $request, $id)

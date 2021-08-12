@@ -26,6 +26,7 @@ textarea {
 }
 
 .menu-threads__adding_chat {
+    padding: 5px!important;
     height: 12%;
     font-size: 14px;
 }

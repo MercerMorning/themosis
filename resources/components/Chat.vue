@@ -53,7 +53,7 @@
         </form>
       </ul>
       <ul class="menu-threads__list" v-else-if="addingChat === 'private'">
-        <li class="menu-threads__item" v-for="user in usersData" v-on:click="openOrCreatePrivateThread"
+        <li class="menu-threads__item" v-for="user in privateUsersData" v-on:click="openOrCreatePrivateThread"
             v-bind:data-id="user.id">
           <a class="menu-threads__link">
             <img class="thread-link__participant_ava" v-bind:src="user.ava">
@@ -82,6 +82,7 @@
 
             <img v-if="thread.is_private" class="thread-link__participant_ava"
                  v-bind:src="thread.ava">
+            <div v-else class="thread-link__participant_ava"></div>
             <div class="thread-link__dialog">
               <div class="thread-link__content">
                 <span class="thread-participant_name">{{ thread.subject }}</span>
@@ -162,7 +163,7 @@
             <svg width="20" height="18">
               <use xlink:href="/content/themes/myinvision/assets//images/sprite.svg#icon-clip"></use>
             </svg>
-            <input type="file" name="file" v-on:change="sendImage">
+            <input type="file"  accept="image/png, image/jpeg"  name="file" v-on:change="sendImage">
           </label>
           <label class="chat-footer__input-text">
             <input class="input-message" type="text" name="body" placeholder="Введите сообщение">
@@ -214,6 +215,7 @@ export default {
     threadmessages: String,
     usertoken: String,
     users: String,
+    privateusers: String,
   },
   data: function () {
     {
@@ -225,7 +227,8 @@ export default {
         threadMessages: JSON.parse(this.threadmessages) ?? null,
         userToken: JSON.parse(this.usertoken) ?? null,
         addingChat: null,
-        usersData: JSON.parse(this.users)
+        usersData: JSON.parse(this.users),
+        privateUsersData: JSON.parse(this.privateusers)
       }
     }
   },
@@ -310,8 +313,10 @@ export default {
       axios.post('/chat/create_private_thread/', {
         'recipient': userId.dataset.id,
       }).then(response => {
+        console.log(response.data.threads);
         this.threadsData = response.data.threads;
-        this.currentThread = response.data.currentThread;
+        this.privateUsersData = response.data.privateUsers;
+        // this.currentThread = response.data.currentThread;
       })
       this.addingChat = null;
     }

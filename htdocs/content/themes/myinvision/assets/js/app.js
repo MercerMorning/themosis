@@ -2143,6 +2143,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   mounted: function mounted() {
     var _this = this;
@@ -2169,7 +2170,8 @@ __webpack_require__.r(__webpack_exports__);
     currentthread: String,
     threadmessages: String,
     usertoken: String,
-    users: String
+    users: String,
+    privateusers: String
   },
   data: function data() {
     {
@@ -2185,7 +2187,8 @@ __webpack_require__.r(__webpack_exports__);
         threadMessages: (_JSON$parse2 = JSON.parse(this.threadmessages)) !== null && _JSON$parse2 !== void 0 ? _JSON$parse2 : null,
         userToken: (_JSON$parse3 = JSON.parse(this.usertoken)) !== null && _JSON$parse3 !== void 0 ? _JSON$parse3 : null,
         addingChat: null,
-        usersData: JSON.parse(this.users)
+        usersData: JSON.parse(this.users),
+        privateUsersData: JSON.parse(this.privateusers)
       };
     }
   },
@@ -2283,8 +2286,9 @@ __webpack_require__.r(__webpack_exports__);
       axios.post('/chat/create_private_thread/', {
         'recipient': userId.dataset.id
       }).then(function (response) {
+        console.log(response.data.threads);
         _this5.threadsData = response.data.threads;
-        _this5.currentThread = response.data.currentThread;
+        _this5.privateUsersData = response.data.privateUsers; // this.currentThread = response.data.currentThread;
       });
       this.addingChat = null;
     }
@@ -14434,7 +14438,7 @@ var render = function() {
         ? _c(
             "ul",
             { staticClass: "menu-threads__list" },
-            _vm._l(_vm.usersData, function(user) {
+            _vm._l(_vm.privateUsersData, function(user) {
               return _c(
                 "li",
                 {
@@ -14504,7 +14508,9 @@ var render = function() {
                           staticClass: "thread-link__participant_ava",
                           attrs: { src: thread.ava }
                         })
-                      : _vm._e(),
+                      : _c("div", {
+                          staticClass: "thread-link__participant_ava"
+                        }),
                     _vm._v(" "),
                     _c("div", { staticClass: "thread-link__dialog" }, [
                       _c("div", { staticClass: "thread-link__content" }, [
@@ -14727,7 +14733,11 @@ var render = function() {
               ]),
               _vm._v(" "),
               _c("input", {
-                attrs: { type: "file", name: "file" },
+                attrs: {
+                  type: "file",
+                  accept: "image/png, image/jpeg",
+                  name: "file"
+                },
                 on: { change: _vm.sendImage }
               })
             ]),
@@ -27104,7 +27114,7 @@ var app = new Vue({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! C:\OpenServer\domains\themosis\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! D:\OpenServer\domains\myinvision_t\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })
