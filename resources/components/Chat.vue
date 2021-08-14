@@ -169,6 +169,7 @@
         </div>
       </div>
       <form class="chat-footer" v-on:submit.prevent="sendMessage">
+
         <input type="hidden" name="threadId" v-bind:value="currentThread.id">
         <div class="chat-footer__input-wrpa">
           <label class="chat-footer__input-file">
@@ -176,6 +177,11 @@
               <use xlink:href="/content/themes/myinvision/assets//images/sprite.svg#icon-clip"></use>
             </svg>
             <input type="file"  accept="image/png, image/jpeg"  name="file" v-on:change="sendImage">
+          </label>
+          <label class="block-chat" v-on:click="blockChat">
+            <svg width="20" height="18">
+              <use xlink:href="/content/themes/myinvision/assets//images/block.svg#block"></use>
+            </svg>
           </label>
           <label class="chat-footer__input-text">
             <input class="input-message" type="text" name="body" placeholder="Введите сообщение">
@@ -339,6 +345,14 @@ export default {
     {
       jQuery('.chat').addClass('mobile-hidden')
       jQuery('.menu-threads').removeClass('mobile-hidden')
+    },
+    blockChat: function ()
+    {
+      axios.post('/chat/block_thread/', {
+        'thread_id': this.currentThread.id,
+      }).then(response => {
+        location.reload();
+      })
     }
   }
 

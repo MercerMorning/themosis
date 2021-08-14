@@ -39,10 +39,16 @@ class MessagesController extends Controller
                 return UserPrepareService::threadPresenterData($user->ID);
             })->toArray();
         $cookieName = 'currentThreadId' . '_' . $currentUserData['id'];
-        if (isset($_COOKIE[$cookieName])) {
-            $threadInfo = $this->showThread(new Request(['id' => $_COOKIE[$cookieName]]));
-            $threadMessages = $threadInfo['threadMessages'];
-            $currentThread = $threadInfo['currentThread'];
+        if (isset($_COOKIE[$cookieName])){
+            if (in_array(AuthUser::currentUserId(), Thread::find($_COOKIE[$cookieName])
+                ->participants()->get()->pluck('user_id')->toArray())) {
+                $threadInfo = $this->showThread(new Request(['id' => $_COOKIE[$cookieName]]));
+                $threadMessages = $threadInfo['threadMessages'];
+                $currentThread = $threadInfo['currentThread'];
+            } else {
+                unset($_COOKIE[$cookieName]);
+            }
+
         }
         $chat = view('front.chat', [
             'userToken' => json_encode($userToken),
@@ -332,5 +338,11 @@ class MessagesController extends Controller
 
 
         return $this->showThread(new Request(['user_id' => $request->get('user_id'), 'id' => $request->get('thread_id')]));
+    }
+
+    function blockThread(Request $request)
+    {
+        Thread::find( $request->get('thread_id'))->removeParticipant(AuthUser::currentUserId());
+
     }
 }

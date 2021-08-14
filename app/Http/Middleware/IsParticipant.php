@@ -24,7 +24,6 @@ class IsParticipant
      */
     public function handle($request, Closure $next)
     {
-// If user logged then create cache data on the 5 minutes.
         if (is_user_logged_in()) {
             if ($request->route()->getName() == "get_thread") {
                 $threadParticipants = Thread::find($request->get('id'))

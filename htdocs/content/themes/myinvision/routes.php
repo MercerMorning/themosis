@@ -24,7 +24,9 @@ Route::get('chat/get_thread/',
 
 Route::post('chat/send_message_to_thread/',
     [\Theme\Controllers\MessagesController::class,
-        'storeMessage'])->name('send_message_to_thread');
+        'storeMessage'])
+    ->middleware('participanting')
+    ->name('send_message_to_thread');
 
 Route::post('chat/create_group_thread/',
     [\Theme\Controllers\MessagesController::class,
@@ -33,6 +35,10 @@ Route::post('chat/create_group_thread/',
 Route::post('chat/create_private_thread/',
     [\Theme\Controllers\MessagesController::class,
         'storePrivate'])->name('create_private_thread');
+
+Route::post('chat/block_thread/',
+    [\Theme\Controllers\MessagesController::class,
+        'blockThread'])->name('block_thread');
 //
 //Route::post('chat/send_message_to_user/',
 //    [\Theme\Controllers\PersonalCorrespondence::class,

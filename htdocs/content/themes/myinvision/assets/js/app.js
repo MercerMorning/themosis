@@ -2156,6 +2156,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   mounted: function mounted() {
     var _this = this;
@@ -2317,6 +2323,13 @@ __webpack_require__.r(__webpack_exports__);
     backToThreadList: function backToThreadList() {
       jQuery('.chat').addClass('mobile-hidden');
       jQuery('.menu-threads').removeClass('mobile-hidden');
+    },
+    blockChat: function blockChat() {
+      axios.post('/chat/block_thread/', {
+        'thread_id': this.currentThread.id
+      }).then(function (response) {
+        location.reload();
+      });
     }
   }
 });
@@ -14819,6 +14832,21 @@ var render = function() {
                 on: { change: _vm.sendImage }
               })
             ]),
+            _vm._v(" "),
+            _c(
+              "label",
+              { staticClass: "block-chat", on: { click: _vm.blockChat } },
+              [
+                _c("svg", { attrs: { width: "20", height: "18" } }, [
+                  _c("use", {
+                    attrs: {
+                      "xlink:href":
+                        "/content/themes/myinvision/assets//images/block.svg#block"
+                    }
+                  })
+                ])
+              ]
+            ),
             _vm._v(" "),
             _vm._m(1),
             _vm._v(" "),

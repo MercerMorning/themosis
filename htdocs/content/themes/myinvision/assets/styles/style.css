@@ -499,3 +499,9 @@ a {
     background-repeat: no-repeat;
     background-image: url('../images/online.png');
 }
+
+.block-chat {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
