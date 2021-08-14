@@ -77,7 +77,8 @@ textarea {
 }
 
 .menu-threads__adding_chat {
-    border-radius: 14px 14px 0px 0px;
+    /*border-radius: 14px 14px 0px 0px;*/
+    border-radius: 14px;
     background-color: #242424;
     padding: 28px 35px;
     font-size: 14px;

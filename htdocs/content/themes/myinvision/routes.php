@@ -39,16 +39,7 @@ Route::post('chat/create_private_thread/',
 Route::post('chat/block_thread/',
     [\Theme\Controllers\MessagesController::class,
         'blockThread'])->name('block_thread');
-//
-//Route::post('chat/send_message_to_user/',
-//    [\Theme\Controllers\PersonalCorrespondence::class,
-//        'sendMessage'])->name('send_message_to_user');
-//
-//
-//Route::post('chat/invite_to_thread/',
-//    [\Theme\Controllers\ThreadController::class,
-//        'inviteParticipant'])->name('invite_participant');
-//
+
 Route::any('page',
-    [\Theme\Controllers\MessagesController::class,
-        'showChat']);
+    [\Theme\Controllers\PageController::class,
+        'index']);

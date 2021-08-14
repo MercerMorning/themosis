@@ -10,19 +10,14 @@ class PageController extends Controller
     public function index()
     {
         global $post;
-        $threads =
-//        $threadsAndUsers = ThreadsListService::getWholeList();
-//        dd($threadsAndUsers);
-        $chat = view('front.chat', [
-//            'currentUser' => json_encode($currentUser->toArray()),
-//            'threads' => json_encode($threadsAndUsers['threads']),
-//            'users' => json_encode($threadsAndUsers['users']),
-        ])->render();
-        return $chat;
-//        global $post;
-//        $content = $post->post_content;
-////        $content = str_replace("!!chat!!", $chat, " $post->post_content");
-//        return $content;
+        $content = $post->post_content;
+        if (strpos($content, "!!chat!!")) {
+            $chat = new MessagesController();
+            $chat = $chat->showChat();
+            $content = str_replace("!!chat!!", $chat, " $post->post_content");
+        };
+
+        return $content;
     }
 
     public function event()
