@@ -58,7 +58,11 @@
         <li class="menu-threads__item" v-for="user in privateUsersData" v-on:click="openOrCreatePrivateThread"
             v-bind:data-id="user.id">
           <a class="menu-threads__link">
-            <img class="thread-link__participant_ava" v-bind:src="user.ava">
+            <div  v-bind:class="[user.online ?
+            'online-user'
+            : 'offline-user']">
+              <img class="thread-link__participant_ava" v-bind:src="user.ava">
+            </div>
             <div class="thread-link__dialog">
               <div class="thread-link__content">
                           <span class="thread-participant_name">
@@ -81,9 +85,12 @@
                ? 'menu-threads__item active'
                : 'menu-threads__item']">
           <a class="menu-threads__link">
-
-            <img v-if="thread.is_private" class="thread-link__participant_ava"
-                 v-bind:src="thread.ava">
+            <div v-if="thread.is_private" v-bind:class="[thread.online ?
+            'online-user'
+            : 'offline-user']">
+              <img class="thread-link__participant_ava"
+                   v-bind:src="thread.ava">
+            </div>
             <div v-else class="thread-link__participant_ava"></div>
             <div class="thread-link__dialog">
               <div class="thread-link__content">
@@ -195,22 +202,21 @@
 <script>
 export default {
   mounted: function () {
-    jQuery(".chat-body").animate({scrollTop: 1000000000}, "slow");
     const socket = new WebSocket("ws://localhost:8999");
 
-    // socket.onopen = () => {
-    //   socket.send("Hello!");
-    // };
+
 
     socket.onmessage = (response) => {
+      axios.get('/chat/get_threads/' + this.currentUserData.id).then(response => {
+        console.log(response.data);
+        this.threadsData = response.data
+      })
 
       let parsedResponse = JSON.parse(response.data);
-      // if (parsedResponse.currentThread.id === this.currentThread.id) {
-      this.threadMessages = parsedResponse.threadMessages;
-      // }
-      // this.threadsData = parsedResponse.threads
-      // this.currentThread = parsedResponse.currentThread;
-      // this.threadMessages = parsedResponse.threadMessages;
+      if (parsedResponse.currentThread.id === this.currentThread.id) {
+        jQuery(".chat-body").animate({scrollTop: 1000000000}, "slow");
+        this.threadMessages = parsedResponse.threadMessages;
+      }
     };
   },
   props: {

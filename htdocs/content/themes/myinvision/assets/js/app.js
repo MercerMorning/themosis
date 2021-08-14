@@ -2149,24 +2149,32 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   mounted: function mounted() {
     var _this = this;
 
-    jQuery(".chat-body").animate({
-      scrollTop: 1000000000
-    }, "slow");
-    var socket = new WebSocket("ws://localhost:8999"); // socket.onopen = () => {
-    //   socket.send("Hello!");
-    // };
+    var socket = new WebSocket("ws://localhost:8999");
 
     socket.onmessage = function (response) {
-      var parsedResponse = JSON.parse(response.data); // if (parsedResponse.currentThread.id === this.currentThread.id) {
+      axios.get('/chat/get_threads/' + _this.currentUserData.id).then(function (response) {
+        console.log(response.data);
+        _this.threadsData = response.data;
+      });
+      var parsedResponse = JSON.parse(response.data);
 
-      _this.threadMessages = parsedResponse.threadMessages; // }
-      // this.threadsData = parsedResponse.threads
-      // this.currentThread = parsedResponse.currentThread;
-      // this.threadMessages = parsedResponse.threadMessages;
+      if (parsedResponse.currentThread.id === _this.currentThread.id) {
+        jQuery(".chat-body").animate({
+          scrollTop: 1000000000
+        }, "slow");
+        _this.threadMessages = parsedResponse.threadMessages;
+      }
     };
   },
   props: {
@@ -14474,10 +14482,18 @@ var render = function() {
                   },
                   [
                     _c("a", { staticClass: "menu-threads__link" }, [
-                      _c("img", {
-                        staticClass: "thread-link__participant_ava",
-                        attrs: { src: user.ava }
-                      }),
+                      _c(
+                        "div",
+                        {
+                          class: [user.online ? "online-user" : "offline-user"]
+                        },
+                        [
+                          _c("img", {
+                            staticClass: "thread-link__participant_ava",
+                            attrs: { src: user.ava }
+                          })
+                        ]
+                      ),
                       _vm._v(" "),
                       _c("div", { staticClass: "thread-link__dialog" }, [
                         _c("div", { staticClass: "thread-link__content" }, [
@@ -14536,10 +14552,20 @@ var render = function() {
                   [
                     _c("a", { staticClass: "menu-threads__link" }, [
                       thread.is_private
-                        ? _c("img", {
-                            staticClass: "thread-link__participant_ava",
-                            attrs: { src: thread.ava }
-                          })
+                        ? _c(
+                            "div",
+                            {
+                              class: [
+                                thread.online ? "online-user" : "offline-user"
+                              ]
+                            },
+                            [
+                              _c("img", {
+                                staticClass: "thread-link__participant_ava",
+                                attrs: { src: thread.ava }
+                              })
+                            ]
+                          )
                         : _c("div", {
                             staticClass: "thread-link__participant_ava"
                           }),

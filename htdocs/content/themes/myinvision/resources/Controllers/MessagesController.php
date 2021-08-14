@@ -90,6 +90,7 @@ class MessagesController extends Controller
                             $userData = UserPrepareService::threadPresenterData($participant);
                             $thread->ava = $userData['ava'];
                             $thread->subject = $userData['first_name'] . ' ' . $userData['last_name'];
+                            $thread->online = $userData['online'];
                         }
                     }
                     );
@@ -207,6 +208,7 @@ class MessagesController extends Controller
                 return $formatedMessages;
             });
 //        $messages->load('user:id,surname,first_name,middle_name');
+
         return [
             'threads' => $threads,
             'currentThread' => $thread,

@@ -471,3 +471,30 @@ a {
 a {
     cursor: pointer;
 }
+.offline-user, .online-user {
+    position: relative;
+}
+
+.offline-user:after {
+    content: "";
+    position: absolute;
+    right: 0px;
+    display: inline-block;
+    cursor: pointer;
+    width: 12px;
+    height: 12px;
+    background-repeat: no-repeat;
+    background-image: url('../images/offline.png');
+}
+
+.online-user:after {
+    content: "";
+    position: absolute;
+    right: 0px;
+    display: inline-block;
+    cursor: pointer;
+    width: 12px;
+    height: 12px;
+    background-repeat: no-repeat;
+    background-image: url('../images/online.png');
+}

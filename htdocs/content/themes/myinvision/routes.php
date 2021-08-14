@@ -12,9 +12,9 @@
 //    [\Theme\Controllers\ThreadController::class,
 //        'add'])->name('add_thread');
 //
-Route::get('chat/get_threads/',
+Route::get('chat/get_threads/{userId}',
     [\Theme\Controllers\MessagesController::class,
-        'getAll'])->name('get_threads');
+        'getAllThreads'])->name('get_threads');
 
 Route::get('chat/get_thread/',
     [\Theme\Controllers\MessagesController::class,
