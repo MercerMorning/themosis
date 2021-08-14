@@ -203,9 +203,7 @@
 export default {
   mounted: function () {
     const socket = new WebSocket("ws://localhost:8999");
-
-
-
+    jQuery(".chat-body").animate({scrollTop: 1000000000}, "slow");
     socket.onmessage = (response) => {
       axios.get('/chat/get_threads/' + this.currentUserData.id).then(response => {
         console.log(response.data);
@@ -247,7 +245,7 @@ export default {
     showThread: function (e) {
       let idItem = event.target.closest('.menu-threads__item');
       axios.get('/chat/get_thread?id=' + idItem.dataset.id).then(response => {
-        document.cookie = "currentThreadId=" + response.data.currentThread.id;
+        document.cookie = "currentThreadId"  + '_' + this.currentUserData.id + '=' + response.data.currentThread.id;
         this.threadsData = response.data.threads
         this.currentThread = response.data.currentThread;
         this.threadMessages = response.data.threadMessages;
@@ -315,6 +313,10 @@ export default {
       }).then(response => {
         this.addingChat = null;
         this.threadsData = response.data.threads;
+        axios.get('/chat/get_threads/' + this.currentUserData.id).then(response => {
+          console.log(response.data);
+          this.threadsData = response.data
+        })
       })
     },
     openCreatingPrivateThread: function (e) {

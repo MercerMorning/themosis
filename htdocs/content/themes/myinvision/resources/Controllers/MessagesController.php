@@ -38,8 +38,9 @@ class MessagesController extends Controller
             ->map(function ($user) {
                 return UserPrepareService::threadPresenterData($user->ID);
             })->toArray();
-        if (isset($_COOKIE['currentThreadId'])) {
-            $threadInfo = $this->showThread(new Request(['id' => $_COOKIE['currentThreadId']]));
+        $cookieName = 'currentThreadId' . '_' . $currentUserData['id'];
+        if (isset($_COOKIE[$cookieName])) {
+            $threadInfo = $this->showThread(new Request(['id' => $_COOKIE[$cookieName]]));
             $threadMessages = $threadInfo['threadMessages'];
             $currentThread = $threadInfo['currentThread'];
         }

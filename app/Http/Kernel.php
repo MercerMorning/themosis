@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\IsParticipant;
 use App\Http\Middleware\IsUserOnline;
 use Themosis\Core\Http\Kernel as HttpKernel;
 
@@ -51,6 +52,7 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $routeMiddleware = [
+        'participanting' => IsParticipant::class,
         'auth' => \App\Http\Middleware\Authenticate::class,
         'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
         'csrf' => \App\Http\Middleware\VerifyCsrfToken::class,

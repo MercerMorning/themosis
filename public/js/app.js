@@ -2161,6 +2161,9 @@ __webpack_require__.r(__webpack_exports__);
     var _this = this;
 
     var socket = new WebSocket("ws://localhost:8999");
+    jQuery(".chat-body").animate({
+      scrollTop: 1000000000
+    }, "slow");
 
     socket.onmessage = function (response) {
       axios.get('/chat/get_threads/' + _this.currentUserData.id).then(function (response) {
@@ -2211,7 +2214,7 @@ __webpack_require__.r(__webpack_exports__);
 
       var idItem = event.target.closest('.menu-threads__item');
       axios.get('/chat/get_thread?id=' + idItem.dataset.id).then(function (response) {
-        document.cookie = "currentThreadId=" + response.data.currentThread.id;
+        document.cookie = "currentThreadId" + '_' + _this2.currentUserData.id + '=' + response.data.currentThread.id;
         _this2.threadsData = response.data.threads;
         _this2.currentThread = response.data.currentThread;
         _this2.threadMessages = response.data.threadMessages;
@@ -2288,6 +2291,10 @@ __webpack_require__.r(__webpack_exports__);
       }).then(function (response) {
         _this4.addingChat = null;
         _this4.threadsData = response.data.threads;
+        axios.get('/chat/get_threads/' + _this4.currentUserData.id).then(function (response) {
+          console.log(response.data);
+          _this4.threadsData = response.data;
+        });
       });
     },
     openCreatingPrivateThread: function openCreatingPrivateThread(e) {
